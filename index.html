@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomato Clicker Simulator - Hyperion Edition</title>
+    <style>
+        /* ==========================================================================
+           1. VARIABLE CONFIGURATIONS & MASTER CORE GRAPHICS THEME
+           ========================================================================== */
+        :root {
+            --bg-main: #140303;
+            --bg-panel: #260a0a;
+            --bg-card: #3d1212;
+            --bg-card-hover: #541a1a;
+            --accent-crimson: #800020;
+            --accent-bright: #d11a2a;
+            --accent-gold: #ffb703;
+            --accent-green: #2a9d8f;
+            --accent-blue: #0284c7;
+            --text-main: #fff5f5;
+            --text-muted: #b39999;
+            --border-color: #541a1a;
+            --border-glow: rgba(209, 26, 42, 0.35);
+        }
+
+        /* ==========================================================================
+           2. RESET MATRIX & BASE STRUCTURAL LAYOUTS
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden; 
+        }
+
+        /* ==========================================================================
+           3. CORE 3-COLUMN ADAPTIVE FLEX/GRID ARCHITECTURE
+           ========================================================================== */
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            width: 100%;
+            height: 100%;
+        }
+
+        .column {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid var(--border-color);
+            height: 100%;
+            overflow-y: auto; 
+            position: relative;
+        }
+
+        .column:last-child {
+            border-right: none;
+        }
+
+        /* Specialized Engine Custom Scrollbars */
+        .column::-webkit-scrollbar {
+            width: 8px;
+        }
+        .column::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+        .column::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        .column::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-crimson);
+        }
+
+        /* ==========================================================================
+           4. INTERACTION SYSTEM: COLUMN 1 GAMEPLAY ENGINE
+           ========================================================================== */
+        .click-column {
+            background: linear-gradient(180deg, var(--bg-main) 0%, #1f0606 100%);
+            gap: 15px;
+            justify-content: flex-start;
+        }
+
+        .header-panel {
+            text-align: center;
+            width: 100%;
+        }
+
+        .game-title {
+            font-size: 2.2rem;
+            color: var(--accent-bright);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(209, 26, 42, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .currency-display {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #fff;
+            margin: 10px 0;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .stats-panel {
+            background: var(--bg-panel);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            box-shadow: inset 0 0 12px rgba(0,0,0,0.6);
+        }
+
+        .stat-line {
+            font-size: 0.95rem;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed rgba(84, 26, 26, 0.4);
+            padding-bottom: 4px;
+        }
+
+        .stat-line:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--accent-bright);
+        }
+
+        /* Arena Wadah Target Klik Utama */
+        .click-target-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 270px;
+            margin: 10px 0;
+        }
+
+        /* Target Lingkaran Utama Hitam Polos Sempurna */
+        .main-circle {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: #000000;
+            border: 6px solid var(--border-color);
+            box-shadow: 0 0 40px var(--border-glow);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Memotong gambar kustom agar melingkar sempurna */
+            transition: transform 0.04s cubic-bezier(0, 0, 0.2, 1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .main-circle:active {
+            transform: scale(0.94);
+        }
+
+        /* Elemen Gambar Kustom Tokoh di Dalam Lingkaran */
+        .main-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2; /* Di atas latar belakang hitam */
+        }
+
+        /* PERBAIKAN FATAL: Overlay Saus Splatter Di Atas Gambar Tokoh */
+        .splat-overlay-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5; /* Z-INDEX TINGGI: Menjamin noda menutupi gambar kustom */
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        /* Tombol Aksi Kontrol Panel */
+        .upload-section {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .action-btn {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-crimson);
+            border-color: var(--accent-bright);
+            transform: translateY(-2px);
+        }
+
+        .action-btn-danger {
+            background: #4a0d0d;
+            border-color: #731c1c;
+        }
+
+        .action-btn-danger:hover {
+            background: #9c1c1c;
+            border-color: #ff3333;
+        }
+
+        #image-upload {
+            display: none;
+        }
+
+        /* Rebirth Interface Panel Dashboard */
+        .rebirth-panel {
+            width: 100%;
+            background: linear-gradient(135deg, #2d0d0d 0%, #420f0f 100%);
+            border: 1px solid #731c1c;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .rebirth-btn {
+            background: var(--accent-gold);
+            color: #140303;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .rebirth-btn:disabled {
+            background: #4a3b1d;
+            color: #7a6b52;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none !important;
+        }
+
+        .rebirth-btn:not(:disabled):hover {
+            background: #fff;
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.7);
+            transform: translateY(-2px);
+        }
+
+        /* ==========================================================================
+           5. NAVIGATION CONTROL & STICKY TAB ENGINE
+           ========================================================================== */
+        .column-header-sticky {
+            position: sticky;
+            top: 0;
+            background: var(--bg-main);
+            z-index: 20;
+            padding-top: 5px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .column-title {
+            font-size: 1.3rem;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .shop-tabs {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .tab-button {
+            flex: 1;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 9px 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .tab-button.active {
+            background: var(--accent-crimson);
+            color: #fff;
+            border-color: var(--accent-bright);
+            box-shadow: 0 0 10px rgba(209, 26, 42, 0.3);
+        }
+
+        .upgrade-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .shop-pane {
+            display: none;
+        }
+
+        .shop-pane.active {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* ==========================================================================
+           6. COMPONENT DESIGN UI CARD (UPGRADES, PERMANENT, ACHIEVEMENTS)
+           ========================================================================== */
+        .upgrade-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upgrade-card:hover:not(.disabled):not(.bought) {
+            border-color: var(--accent-bright);
+            background: var(--bg-card);
+            transform: translateX(4px);
+        }
+
+        .upgrade-card.disabled {
+            opacity: 0.55;
+        }
+
+        .upgrade-card.bought {
+            background: linear-gradient(90deg, #122412 0%, #1a331a 100%);
+            border-color: #2b542b;
+        }
+
+        .upgrade-card.permanent-card {
+            border-color: rgba(255, 183, 3, 0.25);
+        }
+        .upgrade-card.permanent-card:hover:not(.disabled) {
+            border-color: var(--accent-gold);
+            background: #3a2b0a;
+        }
+
+        .upgrade-card.achievement-card {
+            border-color: #1e293b;
+            background: #111827;
+        }
+        .upgrade-card.achievement-card.unlocked {
+            border-color: var(--accent-blue);
+            background: linear-gradient(90deg, #07253d 0%, #0c3559 100%);
+        }
+
+        .upgrade-info {
+            flex-grow: 1;
+            padding-right: 12px;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: #fff;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .upgrade-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .upgrade-effect {
+            font-size: 0.85rem;
+            color: var(--accent-bright);
+            font-weight: 500;
+        }
+
+        .permanent-card .upgrade-effect {
+            color: var(--accent-gold);
+        }
+
+        .achievement-card .upgrade-effect {
+            color: #38bdf8;
+        }
+
+        .upgrade-buy-btn {
+            background: var(--accent-crimson);
+            color: white;
+            border: 1px solid var(--accent-bright);
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            min-width: 95px;
+            text-align: center;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .upgrade-buy-btn:disabled {
+            background: #2b1818;
+            border-color: #402626;
+            color: #6e5454;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .upgrade-buy-btn:not(:disabled):hover {
+            background: var(--accent-bright);
+            box-shadow: 0 0 10px rgba(209, 26, 42, 0.5);
+        }
+
+        .permanent-card .upgrade-buy-btn {
+            background: #b27a00;
+            border-color: var(--accent-gold);
+        }
+        .permanent-card .upgrade-buy-btn:not(:disabled):hover {
+            background: var(--accent-gold);
+            color: #000;
+            box-shadow: 0 0 10px rgba(255, 183, 3, 0.5);
+        }
+
+        .upgrade-card.bought .upgrade-buy-btn {
+            background: #1e3d1e;
+            border-color: #2b542b;
+            color: #72a872;
+            cursor: default;
+        }
+
+        .passive-count {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            background: rgba(0,0,0,0.6);
+            padding: 1px 6px;
+            border-radius: 8px;
+        }
+
+        .achievement-status-badge {
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: #1e293b;
+            color: #64748b;
+        }
+        .unlocked .achievement-status-badge {
+            background: var(--accent-blue);
+            color: #fff;
+            box-shadow: 0 0 8px rgba(2, 132, 199, 0.5);
+        }
+
+        /* ==========================================================================
+           7. ADVANCED PHYSICS & PROJECTILE INTERACTION VFX MATRIX
+           ========================================================================== */
+        
+        /* Floating Text Engine Indicator */
+        .floating-text {
+            position: absolute;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 10px rgba(255,255,255,0.6);
+            animation: floatUpAnimation 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            z-index: 100;
+        }
+
+        @keyframes floatUpAnimation {
+            0% { opacity: 1; transform: translateY(0) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
+        }
+
+        /* PERBAIKAN UTAMA: Proyektil Tomat Terbang Menuju Koordinat Posisi Kursor */
+        .flying-tomato {
+            position: absolute;
+            font-size: 1.5rem;
+            pointer-events: none;
+            z-index: 98;
+            animation: throwDirectToCursor 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            transform-origin: center center;
+        }
+
+        @keyframes throwDirectToCursor {
+            0% {
+                opacity: 0.2;
+                left: var(--sx);
+                top: var(--sy);
+                transform: scale(0.4) rotate(0deg);
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                left: var(--tx);
+                top: var(--ty);
+                transform: scale(1.1) rotate(var(--rot));
+            }
+        }
+
+        /* REALISTIS SPLATTER: Struktur Splash Di Atas Gambar */
+        .tomato-splatter-node {
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: burstShockwave 0.1s ease-out forwards;
+        }
+
+        .splat-svg-graphic {
+            width: 100%;
+            height: 100%;
+            fill: #c60c1e;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.6));
+            animation: stainDripFade 3.5s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+        }
+
+        @keyframes burstShockwave {
+            0% { transform: translate(-50%, -50%) scale(0.1) rotate(var(--r-rot)); }
+            100% { transform: translate(-50%, -50%) scale(var(--r-scale)) rotate(var(--r-rot)); }
+        }
+
+        @keyframes stainDripFade {
+            0% { opacity: 1; transform: translateY(0); }
+            40% { opacity: 0.95; transform: translateY(8px); } /* Efek meleleh turun lambat */
+            100% { opacity: 0; transform: translateY(20px) scale(0.5); }
+        }
+
+        /* Auto Clicker Pulse Rings Aura */
+        .autoclicker-pulse {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--accent-bright);
+            pointer-events: none;
+            z-index: 2;
+            animation: pulseRing 0.5s ease-out forwards;
+        }
+
+        @keyframes pulseRing {
+            0% { width: 220px; height: 220px; opacity: 0.7; }
+            100% { width: 290px; height: 290px; opacity: 0; }
+        }
+
+        /* ==========================================================================
+           8. RESPONSIVE COMPATIBILITY MODULE
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            body { overflow-y: auto; }
+            .game-container { grid-template-columns: 1fr; height: auto; }
+            .column { border-right: none; border-bottom: 2px solid var(--border-color); height: auto; }
+            .click-column { height: 100vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        
+        <!-- ===================================================================
+             KOLOM 1: GAMEPLAY UTAMA, STATISTIK & MODUL TRANSENDENSI
+             =================================================================== -->
+        <div class="column click-column">
+            <div class="header-panel">
+                <h1 class="game-title">Tomato Clicker</h1>
+                <div class="currency-display">
+                    <span id="tomato-count">0</span> <span>🍅</span>
+                </div>
+                
+                <div class="stats-panel">
+                    <div class="stat-line">
+                        <span>Tomat / Detik (TPS):</span>
+                        <span class="stat-value" id="tps-value">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span>Kekuatan Klik Manual:</span>
+                        <span class="stat-value" id="click-power-value">1</span>
+                    </div>
+                    <div class="stat-line">
+                        <span>Auto-Clicker Speed:</span>
+                        <span class="stat-value" id="ac-speed-value" style="color: var(--accent-green);">OFF</span>
+                    </div>
+                    <div class="stat-line">
+                        <span>Ascendent Tomato:</span>
+                        <span class="stat-value" id="ascendent-value" style="color: var(--accent-gold);">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span>Permanent Shop Bonus:</span>
+                        <span class="stat-value" id="perm-bonus-value" style="color: var(--accent-gold);">+0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Lemparan Kontainer Utama -->
+            <div class="click-target-container" id="click-area">
+                <div class="main-circle" id="main-click-target">
+                    <!-- Elemen Gambar Tokoh / Avatar Kustom -->
+                    <img id="custom-avatar" src="" alt="Target">
+                    
+                    <!-- PERBAIKAN UTAMA: Lapisan khusus penampung cipratan saus di atas gambar tokoh -->
+                    <div class="splat-overlay-layer" id="circle-splat-layer"></div>
+                </div>
+            </div>
+
+            <!-- Kontrol Gambar & Reset -->
+            <div class="upload-section">
+                <label for="image-upload" class="action-btn">
+                    <span>📷</span> Ganti Gambar
+                </label>
+                <input type="file" id="image-upload" accept="image/*">
+                
+                <button class="action-btn action-btn-danger" id="reset-button">
+                    <span>♻️</span> Reset Total
+                </button>
+            </div>
+
+            <!-- Sistem Rebirth -->
+            <div class="rebirth-panel">
+                <h3 style="color: var(--accent-gold); font-size: 1.1rem; text-transform: uppercase;">Sistem Transendensi</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Biaya Rebirth: <span style="color:#ff4d4d; font-weight:bold;">25.000</span> Tomat Normal</p>
+                <div style="font-size: 0.95rem; margin-top: 8px; font-weight: bold;">
+                    Hasil Rebirth: <span id="rebirth-gain" style="color: #00ff00;">0</span> Ascendent 🍅
+                </div>
+                <button class="rebirth-btn" id="rebirth-button" disabled>Lakukan Rebirth</button>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             KOLOM 2: ACTIVE MODIFIERS & AUTOMATED ROBOT CLICKERS
+             =================================================================== -->
+        <div class="column">
+            <div class="column-header-sticky">
+                <div class="column-title">
+                    <span>Active Modifiers</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Manual & Auto</span>
+                </div>
+                <div class="shop-tabs">
+                    <button class="tab-button active" onclick="switchTab('active', 'normal-active')">Upgrades</button>
+                    <button class="tab-button" onclick="switchTab('active', 'autoclicker-pane')">Auto-Clickers</button>
+                </div>
+            </div>
+
+            <!-- Sub Pane 1: Normal Active Upgrades -->
+            <div id="normal-active" class="shop-pane active">
+                <div class="upgrade-list" id="active-upgrades-container"></div>
+            </div>
+
+            <!-- Sub Pane 2: Auto Clicker Engine Control -->
+            <div id="autoclicker-pane" class="shop-pane">
+                <div class="upgrade-list" id="autoclicker-upgrades-container"></div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             KOLOM 3: PASSIVE INDUSTRY, REBIRTH SHOP & ACHIEVEMENTS Matrix
+             =================================================================== -->
+        <div class="column">
+            <div class="column-header-sticky">
+                <div class="column-title">
+                    <span>Empire Industries</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Aset Global</span>
+                </div>
+                <div class="shop-tabs">
+                    <button class="tab-button active" onclick="switchTab('passive', 'normal-passive')">Shops</button>
+                    <button class="tab-button" style="color: var(--accent-gold); border-color: rgba(255,183,3,0.3);" onclick="switchTab('passive', 'permanent-shop')">🏛️ Rebirth Shop</button>
+                    <button class="tab-button" style="color: var(--accent-blue); border-color: rgba(2,132,199,0.3);" onclick="switchTab('passive', 'achievements-shop')">🏆 Badges</button>
+                </div>
+            </div>
+
+            <!-- Sub Pane 1: Normal Passive Industry -->
+            <div id="normal-passive" class="shop-pane active">
+                <div class="upgrade-list" id="passive-upgrades-container"></div>
+            </div>
+
+            <!-- Sub Pane 2: Permanent Shop (Ascendent Tomatoes Currency) -->
+            <div id="permanent-shop" class="shop-pane">
+                <div style="background: rgba(255,183,3,0.08); border: 1px solid rgba(255,183,3,0.25); padding: 10px; border-radius: 6px; font-size: 0.8rem; color: #ffe6a7; margin-bottom: 5px; text-align: center;">
+                    ⚠️ Item di Rebirth Shop bersifat **PERMANEN** & tidak terhapus saat melakukan Rebirth/Reset Normal!
+                </div>
+                <div class="upgrade-list" id="permanent-upgrades-container"></div>
+            </div>
+
+            <!-- Sub Pane 3: Achievements Matrix Records Layout -->
+            <div id="achievements-shop" class="shop-pane">
+                <div style="background: rgba(2,132,199,0.08); border: 1px solid rgba(2, 132, 199, 0.25); padding: 10px; border-radius: 6px; font-size: 0.8rem; color: #bae6fd; margin-bottom: 5px; text-align: center;">
+                    Selesaikan tantangan di bawah untuk membuktikan keahlian melempar tomatmu!
+                </div>
+                <div class="upgrade-list" id="achievements-container"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==========================================================================
+       9. ADVANCED ARCHITECTURE JAVASCRIPT SIMULATION ENGINE
+       ========================================================================== */ -->
+    <script>
+        // --- MASTER STATE ARCHITECTURE DATABASE ---
+        let game = {
+            tomatoes: 0,
+            ascendentTomatoes: 0,
+            fineIDoItMyselfMultiplier: 1,
+            
+            // Statistics Tracker Data Matrix
+            stats: {
+                totalLifetimeTomatoes: 0,
+                totalManualClicks: 0,
+                totalAutomatedClicks: 0,
+                totalRebirthsCount: 0
+            },
+            
+            // Active Items Map Boolean records
+            actives: {
+                largerHand: false, fasterThrow: false, tomatoGun: false, leftHand: false, 
+                machineGun: false, mutation: false, bullsEye: false, artificialRain: false, 
+                fineIDoItMyself: false, nuclearSplatter: false, dimensionalGlove: false, infinitySplat: false
+            },
+            
+            // Passive Upgrades Level Counter
+            passives: {
+                thrower: 0, tripleThrower: 0, gatling: 0, farm: 0, factory: 0, 
+                rain: 0, storm: 0, disaster: 0, catastrophe: 0, apocalypse: 0,
+                galacticHarvest: 0, realityFolder: 0
+            },
+            
+            // Automated Clicker Bot Level Engine
+            autoClickerLevel: 0,
+
+            // Permanent Rebirth Shop Purchase Levels
+            permanentUpgrades: {
+                goldenSeeds: 0,      
+                ancestralJuicer: 0,  
+                heavenlySubsidy: 0,  
+                efficientFarming: 0, 
+                hyperDrive: 0        
+            },
+
+            // Achievements Unlocked Database Map
+            unlockedAchievements: {
+                firstSplat: false,
+                tomatoMillionaire: false,
+                clickAddict: false,
+                rebirthAscension: false,
+                industrialist: false,
+                automationGod: false,
+                billionaireClub: false,
+                cosmicHarvester: false
+            }
+        };
+
+        // --- CORE DATABASE CONFIGURATIONS CONTEXT ---
+
+        const ACTIVE_DB = [
+            { id: 'largerHand', name: 'Larger hand', cost: 50, desc: 'Memperluas jangkauan genggaman tangan Anda.', effect: '+1 tomat / klik' },
+            { id: 'fasterThrow', name: 'Faster Throw™', cost: 250, desc: 'Melempar secara refleks dengan kecepatan tinggi.', effect: '10% peluang klik ganda (2x)' },
+            { id: 'tomatoGun', name: 'Tomato Gun', cost: 1500, desc: 'Pistol pegas khusus pelontar buah tomat ranum.', effect: '+4 tomat / klik' },
+            { id: 'leftHand', name: 'Left hand', cost: 8000, desc: 'Melatih tangan kiri agar seimbang saat melempar.', effect: '+8 tomat / klik' },
+            { id: 'machineGun', name: 'Machine Gun', cost: 35000, desc: 'Senjata otomatis portabel dengan amunisi tomat.', effect: '+25 tomat / klik' },
+            { id: 'mutation', name: 'Biochemical Mutation', cost: 120000, desc: 'Mutasi biologis otot tangan untuk kekuatan lempar masif.', effect: '+60 tomat / klik' },
+            { id: 'bullsEye', name: 'Bull\'s eye Precision', cost: 450000, desc: 'Akurasi fatal tepat mengenai titik pusat terdalam target.', effect: '+15% peluang Critical Click (5x Hasil)' },
+            { id: 'artificialRain', name: 'Artificial Weather Controller', cost: 1500000, desc: 'Hujan buatan teratur mempercepat aktivitas perkebunan.', effect: 'Melipatgandakan Seluruh Pendapatan Pasif (2x TPS)' },
+            { id: 'nuclearSplatter', name: 'Nuclear Core Splat', cost: 8000000, desc: 'Merendam tomat dalam reaktor nuklir cair sebelum dilemparkan.', effect: '+250 tomat / klik' },
+            { id: 'dimensionalGlove', name: 'Dimensional Tear Glove', cost: 45000000, desc: 'Sarung tangan kosmik penembus celah ruang dan waktu.', effect: '+1.500 tomat / klik' },
+            { id: 'fineIDoItMyself', name: 'Fine i do it myself', cost: 250000000, desc: 'Menghapus 50% aset pabrik pasif demi efisiensi mutlak.', effect: 'ALL TPS & Daya Klik Dasar dikalikan 3x lipat secara permanen.' },
+            { id: 'infinitySplat', name: 'Infinity Splatter Matrix', cost: 2000000000, desc: 'Menggabungkan partikel tomat dengan energi singularitas abadi.', effect: '+15.000 tomat / klik' }
+        ];
+
+        const PASSIVE_DB = [
+            { id: 'thrower', name: 'Tomato Thrower Drone', baseCost: 15, cps: 1, desc: 'Drone android sederhana melempar dari berbagai arah udara.' },
+            { id: 'tripleThrower', name: 'Triple Turret Launcher', baseCost: 120, cps: 4, desc: 'Tiga laras peluncur mekanis tersinkronisasi otomatis.' },
+            { id: 'gatling', name: 'Gatling Toma-Tron 3000', baseCost: 1400, cps: 15, desc: 'Senapan mesin rotasi putar berkapasitas muatan tinggi.' },
+            { id: 'farm', name: 'Hydroponic Tomato Farm', baseCost: 15000, cps: 70, desc: 'Ladang subur berbasis nutrisi cair buatan premium.' },
+            { id: 'factory', name: 'Automated Processing Plant', baseCost: 160000, cps: 350, desc: 'Kompleks industri pemrosesan buah otomatis skala masif.' },
+            { id: 'rain', name: 'Stratospheric Cloud Seeder', baseCost: 1800000, cps: 1800, desc: 'Manipulasi cuaca awan pemanggil badai hujan tomat makro.' },
+            { id: 'storm', name: 'Vortex Tomato Storm', baseCost: 25000000, cps: 9500, desc: 'Badai topan bertekanan udara tinggi penggulung buah.' },
+            { id: 'disaster', name: 'Tomato Continental Cataclysm', baseCost: 400000000, cps: 55000, desc: 'Bencana alam berbasis materi tomat berskala kontinental.' },
+            { id: 'catastrophe', name: 'Global Biosphere Overgrowth', baseCost: 6000000000, cps: 320000, desc: 'Mutasi vegetasi global mengubah atmosfer menjadi cairan jus.' },
+            { id: 'apocalypse', name: 'The Great Tomato Apocalypse', baseCost: 90000000000, cps: 2000000, desc: 'Kiamat kehancuran kosmik pembuat akhir peradaban dunia.' },
+            { id: 'galacticHarvest', name: 'Galactic Dyson Harvester', baseCost: 1500000000000, cps: 15000000, desc: 'Megastruktur cincin bintang pengekstrak energi tomat galaksi.' },
+            { id: 'realityFolder', name: 'Reality Folding Bio-Engine', baseCost: 25000000000000, cps: 120000000, desc: 'Melipat dimensi realitas demi menciptakan tomat.' }
+        ];
+
+        const AUTOCLICKER_DB = [
+            { level: 1, cost: 100, cpsRate: 1, desc: 'Mekanik robotik dasar penekan target otomatis.' },
+            { level: 2, cost: 800, cpsRate: 2, desc: 'Peningkatan hidrolik mempercepat kecepatan kompresi.' },
+            { level: 3, cost: 5000, cpsRate: 4, desc: 'Chip memori taktis mengoptimalkan sirkuit hantaman.' },
+            { level: 4, cost: 30000, cpsRate: 7, desc: 'Sistem motor servo ganda memperlancar ritme ketukan.' },
+            { level: 5, cost: 180000, cpsRate: 12, desc: 'Inti energi magnetik memicu hentakan cepat konstan.' },
+            { level: 6, cost: 1200000, cpsRate: 20, desc: 'Auto-klik berbasis frekuensi gelombang ultrasonik.' },
+            { level: 7, cost: 9000000, cpsRate: 35, desc: 'Modulasi waktu tak terbatas mempercepat ketukan.' },
+            { level: 8, cost: 75000000, cpsRate: 60, desc: 'Asisten AI kuantum melakukan klik kalkulasi sub-atomik.' },
+            { level: 9, cost: 600000000, cpsRate: 100, desc: 'Dewa Overclocking memecah batas fisik material.' }
+        ];
+
+        const PERMANENT_SHOP_DB = [
+            { id: 'goldenSeeds', name: 'Golden Mythic Seeds', cost: 1, max: 20, desc: 'Benih abadi purba meningkatkan seluruh efisiensi produksi.', effect: '+25% Pendapatan Pasif (TPS) Global per level' },
+            { id: 'ancestralJuicer', name: 'Ancestral Artifact Juicer', cost: 2, max: 15, desc: 'Alat peras pusaka memberikan kekuatan klik awal mendasar.', effect: '+5 Klik Power Murni Dasar per level' },
+            { id: 'heavenlySubsidy', name: 'Heavenly Financial Subsidy', cost: 3, max: 10, desc: 'Dukungan dana dari dewa tomat saat memulai ulang permainan.', effect: 'Memulai run baru dengan +5.000 Tomat per level' },
+            { id: 'efficientFarming', name: 'Efficient Management Ledger', cost: 2, max: 10, desc: 'Buku akuntansi taktis memangkas inflasi harga pasar retail.', effect: 'Diskon 5% biaya belanja Toko Normal & Active per level' },
+            { id: 'hyperDrive', name: 'Quantum Click Hyperdrive', cost: 5, max: 2, desc: 'Sistem transmisi tachyon mempercepat sirkuit mesin auto-clicker.', effect: 'Melipatgandakan total Clicks Per Second dari Auto-Clicker Bot' }
+        ];
+
+        const ACHIEVEMENTS_DB = [
+            { id: 'firstSplat', name: 'First Blood Splat', desc: 'Lakukan klik manual pertama kali pada target lingkaran.', conditionStr: '1 Klik Manual' },
+            { id: 'tomatoMillionaire', name: 'Tomato Wealthy', desc: 'Kumpulkan akumulasi tabungan sebesar 1 Juta Tomat.', conditionStr: '1.000.000 Total Tomat' },
+            { id: 'clickAddict', name: 'Finger Destroyer', desc: 'Tekan tombol lingkaran target secara manual sebanyak 500 kali.', conditionStr: '500 Klik Manual' },
+            { id: 'rebirthAscension', name: 'First Transcendent Step', desc: 'Lakukan mekanisme Rebirth pertama kalinya.', conditionStr: '1 Total Rebirth' },
+            { id: 'industrialist', name: 'Automated Empire', desc: 'Miliki minimal total 50 aset bangunan pabrik pasif.', conditionStr: '50 Unit Pabrik Pasif' },
+            { id: 'automationGod', name: 'Sky-Net Integration', desc: 'Upgrade Robot Auto-Clicker hingga menyentuh Level 5.', conditionStr: 'Auto-Clicker Lvl 5' },
+            { id: 'billionaireClub', name: 'The Elitist 1%', desc: 'Raih total pendapatan lifetime sebesar 1 Milyar Tomat.', conditionStr: '1.000.000.000 Total Tomat' },
+            { id: 'cosmicHarvester', name: 'Reality Shifter', desc: 'Beli minimal satu unit mesin pelipat realitas (Reality Folder).', conditionStr: '1 Reality Folder Purchased' }
+        ];
+
+        const REBIRTH_REQUIREMENT = 25000;
+        let autoClickerTimerId = null;
+
+        // --- SUB SECTION INTERFACE TABS NAVIGATION CONTROLLER ---
+        window.switchTab = function(columnType, tabId) {
+            const columnNode = document.getElementById(tabId).closest('.column');
+            const targetButtons = columnNode.querySelectorAll('.tab-button');
+            targetButtons.forEach(btn => btn.classList.remove('active'));
+            
+            const targetPanes = columnNode.querySelectorAll('.shop-pane');
+            targetPanes.forEach(pane => pane.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        };
+
+        // --- STORAGE SAVE & LOAD CONTROLLER IMPLEMENTATION ---
+        function saveGame() {
+            localStorage.setItem('tomato_hyperion_save_state', JSON.stringify(game));
+        }
+
+        function loadGame() {
+            const savedData = localStorage.getItem('tomato_hyperion_save_state');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    if (parsed && typeof parsed.tomatoes === 'number') {
+                        game = { ...game, ...parsed };
+                        if (parsed.actives) game.actives = { ...game.actives, ...parsed.actives };
+                        if (parsed.passives) game.passives = { ...game.passives, ...parsed.passives };
+                        if (parsed.permanentUpgrades) game.permanentUpgrades = { ...game.permanentUpgrades, ...parsed.permanentUpgrades };
+                        if (parsed.unlockedAchievements) game.unlockedAchievements = { ...game.unlockedAchievements, ...parsed.unlockedAchievements };
+                        if (parsed.stats) game.stats = { ...game.stats, ...parsed.stats };
+                    }
+                } catch (e) {
+                    console.error("Gagal melakukan restorasi data penyimpanan", e);
+                }
+            }
+
+            // Memuat gambar Base64 dari local storage jika tersedia
+            const storedImage = localStorage.getItem('tomato_hyperion_saved_avatar_img');
+            if (storedImage) {
+                const imgElement = document.getElementById('custom-avatar');
+                imgElement.src = storedImage;
+                imgElement.style.display = 'block';
+            }
+
+            reinitializeAutoClickerEngine();
+        }
+
+        // --- MATH MATHEMATICAL CONFIGURATORS ENGINE ---
+        function getDiscountFactor() {
+            const level = game.permanentUpgrades.efficientFarming || 0;
+            return 1 - (level * 0.05); 
+        }
+
+        function getPassiveCost(id) {
+            const config = PASSIVE_DB.find(p => p.id === id);
+            const base = config.baseCost * getDiscountFactor();
+            return Math.floor(base * Math.pow(1.15, game.passives[id]));
+        }
+
+        function getActiveCost(config) {
+            return Math.floor(config.cost * getDiscountFactor());
+        }
+
+        function getAutoClickerCost() {
+            const nextLevel = game.autoClickerLevel + 1;
+            const config = AUTOCLICKER_DB.find(a => a.level === nextLevel);
+            if (!config) return Infinity;
+            return Math.floor(config.cost * getDiscountFactor());
+        }
+
+        function getRebirthGain() {
+            if (game.tomatoes < REBIRTH_REQUIREMENT) return 0;
+            return Math.floor(game.tomatoes / REBIRTH_REQUIREMENT);
+        }
+
+        function getPermanentShopMultiplier() {
+            const level = game.permanentUpgrades.goldenSeeds || 0;
+            return 1 + (level * 0.25); 
+        }
+
+        function calculateClickPower() {
+            let baseClick = 1;
+            const ancestralLvl = game.permanentUpgrades.ancestralJuicer || 0;
+            baseClick += (ancestralLvl * 5);
+
+            if (game.actives.largerHand) baseClick += 1;
+            if (game.actives.tomatoGun) baseClick += 4;
+            if (game.actives.leftHand) baseClick += 8;
+            if (game.actives.machineGun) baseClick += 25;
+            if (game.actives.mutation) baseClick += 60;
+            if (game.actives.nuclearSplatter) baseClick += 250;
+            if (game.actives.dimensionalGlove) baseClick += 1500;
+            if (game.actives.infinitySplat) baseClick += 15000;
+
+            baseClick *= game.fineIDoItMyselfMultiplier;
+            const rebirthBonusFactor = 1 + (game.ascendentTomatoes * 0.50);
+            
+            return Math.floor(baseClick * rebirthBonusFactor);
+        }
+
+        function calculateTotalTPS() {
+            let totalCps = 0;
+            PASSIVE_DB.forEach(p => { 
+                totalCps += game.passives[p.id] * p.cps; 
+            });
+            
+            if (game.actives.fineIDoItMyself) totalCps *= 3;
+            if (game.actives.artificialRain) totalCps *= 2;
+            
+            const rebirthBonusFactor = 1 + (game.ascendentTomatoes * 0.50);
+            totalCps *= rebirthBonusFactor * getPermanentShopMultiplier();
+            
+            return totalCps;
+        }
+
+        function formatNumber(num) {
+            if (num === Infinity) return 'MAX';
+            if (num >= 1e12) return (num / 1e12).toFixed(2) + ' T';
+            if (num >= 1e9) return (num / 1e9).toFixed(2) + ' B';
+            if (num >= 1e6) return (num / 1e6).toFixed(2) + ' M';
+            if (num >= 1e3) return (num / 1e3).toFixed(1) + ' K';
+            return Math.floor(num).toString();
+        }
+
+        // --- DYNAMIC MATRIX REAL-TIME ACHIEVEMENT TRACKER ---
+        function runAchievementCheckRoutines() {
+            let totalPassiveUnits = 0;
+            Object.keys(game.passives).forEach(k => totalPassiveUnits += game.passives[k]);
+
+            if (game.stats.totalManualClicks >= 1 && !game.unlockedAchievements.firstSplat) {
+                game.unlockedAchievements.firstSplat = true;
+                triggerFloatingTextIncome(100, 100, "🏆 BADGE UNLOCKED!");
+            }
+            if (game.stats.totalManualClicks >= 500 && !game.unlockedAchievements.clickAddict) {
+                game.unlockedAchievements.clickAddict = true;
+            }
+            if (game.stats.totalLifetimeTomatoes >= 1000000 && !game.unlockedAchievements.tomatoMillionaire) {
+                game.unlockedAchievements.tomatoMillionaire = true;
+            }
+            if (game.stats.totalLifetimeTomatoes >= 1000000000 && !game.unlockedAchievements.billionaireClub) {
+                game.unlockedAchievements.billionaireClub = true;
+            }
+            if (game.stats.totalRebirthsCount >= 1 && !game.unlockedAchievements.rebirthAscension) {
+                game.unlockedAchievements.rebirthAscension = true;
+            }
+            if (totalPassiveUnits >= 50 && !game.unlockedAchievements.industrialist) {
+                game.unlockedAchievements.industrialist = true;
+            }
+            if (game.autoClickerLevel >= 5 && !game.unlockedAchievements.automationGod) {
+                game.unlockedAchievements.automationGod = true;
+            }
+            if (game.passives.realityFolder >= 1 && !game.unlockedAchievements.cosmicHarvester) {
+                game.unlockedAchievements.cosmicHarvester = true;
+            }
+        }
+
+        // --- GRAPHICAL USER INTERFACE RENDER REFRESHER ---
+        function updateUI() {
+            document.getElementById('tomato-count').innerText = formatNumber(game.tomatoes);
+            document.getElementById('tps-value').innerText = formatNumber(calculateTotalTPS());
+            document.getElementById('click-power-value').innerText = formatNumber(calculateClickPower());
+            document.getElementById('ascendent-value').innerText = game.ascendentTomatoes;
+            document.getElementById('perm-bonus-value').innerText = `+${((getPermanentShopMultiplier() - 1) * 100).toFixed(0)}%`;
+
+            const acSpeedContainer = document.getElementById('ac-speed-value');
+            if (game.autoClickerLevel <= 0) {
+                acSpeedContainer.innerText = "OFF";
+                acSpeedContainer.style.color = "var(--text-muted)";
+            } else {
+                const currentAC = AUTOCLICKER_DB.find(a => a.level === game.autoClickerLevel);
+                let speedText = currentAC.cpsRate;
+                if (game.permanentUpgrades.hyperDrive > 0) speedText *= (1 + game.permanentUpgrades.hyperDrive);
+                acSpeedContainer.innerText = `${speedText} Klik/Dtk`;
+                acSpeedContainer.style.color = "var(--accent-green)";
+            }
+
+            const gain = getRebirthGain();
+            document.getElementById('rebirth-gain').innerText = gain;
+            document.getElementById('rebirth-button').disabled = (game.tomatoes < REBIRTH_REQUIREMENT);
+
+            // RENDER ACTIVE UPGRADES
+            const activeContainer = document.getElementById('active-upgrades-container');
+            activeContainer.innerHTML = '';
+            ACTIVE_DB.forEach(up => {
+                const isBought = game.actives[up.id];
+                const realCost = getActiveCost(up);
+                const card = document.createElement('div');
+                card.className = `upgrade-card ${isBought ? 'bought' : ''} ${(!isBought && game.tomatoes < realCost) ? 'disabled' : ''}`;
+                card.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">${up.name}</div>
+                        <div class="upgrade-desc">${up.desc}</div>
+                        <div class="upgrade-effect">${up.effect}</div>
+                    </div>
+                    <button class="upgrade-buy-btn" ${isBought || game.tomatoes < realCost ? 'disabled' : ''} onclick="buyActiveUpgrade('${up.id}', ${realCost})">
+                        ${isBought ? '✓ DIBELI' : '🍅 ' + formatNumber(realCost)}
+                    </button>
+                `;
+                activeContainer.appendChild(card);
+            });
+
+            // RENDER AUTO CLICKERS PANEL
+            const acContainer = document.getElementById('autoclicker-upgrades-container');
+            acContainer.innerHTML = '';
+            const nextACLevel = game.autoClickerLevel + 1;
+            const acConfig = AUTOCLICKER_DB.find(a => a.level === nextACLevel);
+            
+            const acStatusHeader = document.createElement('div');
+            acStatusHeader.style.cssText = "padding: 5px; font-size:0.85rem; color: var(--text-muted); text-align:center; background:rgba(0,0,0,0.2); border-radius:4px;";
+            acStatusHeader.innerText = `Level Auto-Clicker Saat Ini: ${game.autoClickerLevel} / ${AUTOCLICKER_DB.length}`;
+            acContainer.appendChild(acStatusHeader);
+
+            if (acConfig) {
+                const acCost = getAutoClickerCost();
+                const acCard = document.createElement('div');
+                acCard.className = `upgrade-card ${game.tomatoes < acCost ? 'disabled' : ''}`;
+                acCard.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">🤖 Upgrade Auto-Clicker Bot (Lvl ${acConfig.level})</div>
+                        <div class="upgrade-desc">${acConfig.desc}</div>
+                        <div class="upgrade-effect">Menjadi ${acConfig.cpsRate} klik otomatis per detik</div>
+                    </div>
+                    <button class="upgrade-buy-btn" ${game.tomatoes < acCost ? 'disabled' : ''} onclick="buyAutoClickerLevel(${acCost})">
+                        🍅 ${formatNumber(acCost)}
+                    </button>
+                `;
+                acContainer.appendChild(acCard);
+            } else {
+                const maxCard = document.createElement('div');
+                maxCard.className = `upgrade-card bought`;
+                maxCard.innerHTML = `<div class="upgrade-info" style="text-align:center;font-weight:bold;color:var(--accent-gold);">🤖 AUTO-CLICKER BOT TELAH MENCAPAI LEVEL MAKSIMAL!</div>`;
+                acContainer.appendChild(maxCard);
+            }
+
+            // RENDER PASSIVE INDUSTRY SHOPS
+            const passiveContainer = document.getElementById('passive-upgrades-container');
+            passiveContainer.innerHTML = '';
+            PASSIVE_DB.forEach(up => {
+                const cost = getPassiveCost(up.id);
+                const count = game.passives[up.id];
+                const card = document.createElement('div');
+                card.className = `upgrade-card ${game.tomatoes < cost ? 'disabled' : ''}`;
+                card.innerHTML = `
+                    ${count > 0 ? `<div class="passive-count">${count}</div>` : ''}
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">${up.name}</div>
+                        <div class="upgrade-desc">${up.desc}</div>
+                        <div class="upgrade-effect">+${formatNumber(up.cps)} TPS / Unit</div>
+                    </div>
+                    <button class="upgrade-buy-btn" ${game.tomatoes < cost ? 'disabled' : ''} onclick="buyPassiveUpgrade('${up.id}')">
+                        🍅 ${formatNumber(cost)}
+                    </button>
+                `;
+                passiveContainer.appendChild(card);
+            });
+
+            // RENDER PERMANENT REBIRTH SHOP ITEMS
+            const listWrapper = document.getElementById('permanent-upgrades-container');
+            listWrapper.innerHTML = '';
+            PERMANENT_SHOP_DB.forEach(up => {
+                const currentLvl = game.permanentUpgrades[up.id] || 0;
+                const isMax = currentLvl >= up.max;
+                const card = document.createElement('div');
+                card.className = `upgrade-card permanent-card ${isMax ? 'bought' : ''} ${(!isMax && game.ascendentTomatoes < up.cost) ? 'disabled' : ''}`;
+                card.innerHTML = `
+                    ${currentLvl > 0 ? `<div class="passive-count" style="color:var(--accent-gold);border-color:var(--accent-gold);">${currentLvl}/${up.max}</div>` : ''}
+                    <div class="upgrade-info">
+                        <div class="upgrade-name" style="color:var(--accent-gold);">🏛️ ${up.name}</div>
+                        <div class="upgrade-desc" style="color:#d9c2c2;">${up.desc}</div>
+                        <div class="upgrade-effect">${up.effect}</div>
+                    </div>
+                    <button class="upgrade-buy-btn" ${isMax || game.ascendentTomatoes < up.cost ? 'disabled' : ''} onclick="buyPermanentUpgrade('${up.id}', ${up.cost}, ${up.max})">
+                        ${isMax ? 'MAKSIMAL' : '⭐ ' + up.cost}
+                    </button>
+                `;
+                listWrapper.appendChild(card);
+            });
+
+            // RENDER ACHIEVEMENTS MATRIX CARDS
+            const achContainer = document.getElementById('achievements-container');
+            achContainer.innerHTML = '';
+            ACHIEVEMENTS_DB.forEach(ach => {
+                const isUnlocked = game.unlockedAchievements[ach.id];
+                const card = document.createElement('div');
+                card.className = `upgrade-card achievement-card ${isUnlocked ? 'unlocked' : ''}`;
+                card.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name" style="color: ${isUnlocked ? 'var(--accent-blue)' : '#94a3b8'};">🏆 ${ach.name}</div>
+                        <div class="upgrade-desc" style="color: #cbd5e1;">${ach.desc}</div>
+                        <div class="upgrade-effect">Syarat: ${ach.conditionStr}</div>
+                    </div>
+                    <div class="achievement-status-badge">
+                        ${isUnlocked ? 'TERBUKA' : 'TERKUNCI'}
+                    </div>
+                `;
+                achContainer.appendChild(card);
+            });
+        }
+
+        // --- SHOP INTERACTION IMPLEMENTATIONS ---
+        window.buyActiveUpgrade = function(id, cost) {
+            if (game.tomatoes >= cost && !game.actives[id]) {
+                game.tomatoes -= cost;
+                game.actives[id] = true;
+                
+                if (id === 'fineIDoItMyself') {
+                    game.fineIDoItMyselfMultiplier = 3;
+                    game.tomatoes = Math.floor(game.tomatoes / 2);
+                    Object.keys(game.passives).forEach(k => {
+                        game.passives[k] = Math.floor(game.passives[k] / 2);
+                    });
+                }
+                
+                runAchievementCheckRoutines();
+                updateUI();
+                saveGame();
+            }
+        };
+
+        window.buyPassiveUpgrade = function(id) {
+            const cost = getPassiveCost(id);
+            if (game.tomatoes >= cost) {
+                game.tomatoes -= cost;
+                game.passives[id]++;
+                runAchievementCheckRoutines();
+                updateUI();
+                saveGame();
+            }
+        };
+
+        window.buyAutoClickerLevel = function(cost) {
+            if (game.tomatoes >= cost) {
+                game.tomatoes -= cost;
+                game.autoClickerLevel++;
+                
+                reinitializeAutoClickerEngine();
+                runAchievementCheckRoutines();
+                updateUI();
+                saveGame();
+            }
+        };
+
+        window.buyPermanentUpgrade = function(id, cost, maxSlot) {
+            const currentLvl = game.permanentUpgrades[id] || 0;
+            if (game.ascendentTomatoes >= cost && currentLvl < maxSlot) {
+                game.ascendentTomatoes -= cost;
+                game.permanentUpgrades[id] = currentLvl + 1;
+                updateUI();
+                saveGame();
+            }
+        };
+
+        // --- ENGINE CONTROLLER: AUTOMATED AUTO CLICK MATRIX ---
+        function reinitializeAutoClickerEngine() {
+            if (autoClickerTimerId) {
+                clearInterval(autoClickerTimerId);
+                autoClickerTimerId = null;
+            }
+
+            if (game.autoClickerLevel <= 0) return;
+
+            const currentAC = AUTOCLICKER_DB.find(a => a.level === game.autoClickerLevel);
+            if (!currentAC) return;
+
+            let totalCpsRate = currentAC.cpsRate;
+            if (game.permanentUpgrades.hyperDrive > 0) {
+                totalCpsRate *= (1 + game.permanentUpgrades.hyperDrive);
+            }
+
+            const tickIntervalDelay = 1000 / totalCpsRate;
+
+            autoClickerTimerId = setInterval(() => {
+                // Auto click memicu lemparan mekanis ke posisi tengah acak lingkaran target
+                executeCoreClickGameplay(null, true); 
+            }, tickIntervalDelay);
+        }
+
+        // --- GRAPHICS GRAPHICAL PIPELINE VISUAL SYSTEM ---
+        
+        // PERBAIKAN UTAMA: Cipratan saus dihasilkan di atas gambar kustom tokoh
+        function triggerSplatVFX(targetLayer, x, y, isCircleBound) {
+            const splatDiv = document.createElement('div');
+            splatDiv.className = 'tomato-splatter-node';
+            
+            splatDiv.style.left = x + 'px';
+            splatDiv.style.top = y + 'px';
+            splatDiv.style.setProperty('--r-rot', Math.random() * 360 + 'deg');
+            splatDiv.style.setProperty('--r-scale', (Math.random() * 0.4 + 0.8));
+
+            splatDiv.innerHTML = `
+                <svg class="splat-svg-graphic" viewBox="0 0 100 100">
+                    <path d="M50 10 C38 14, 30 4, 18 12 C8 20, 15 35, 4 45 C-5 55, 6 70, 14 80 C22 90, 40 85, 50 95 C60 105, 72 90, 84 85 C96 78, 92 62, 98 50 C104 36, 94 26, 84 16 C74 6, 60 6, 50 10 Z"/>
+                    <circle cx="20" cy="25" r="4" />
+                    <circle cx="75" cy="20" r="3" />
+                    <circle cx="85" cy="65" r="5" />
+                    <circle cx="15" cy="60" r="4" />
+                </svg>
+            `;
+
+            targetLayer.appendChild(splatDiv);
+
+            // Batasi tumpukan noda di DOM agar tidak menurunkan FPS
+            const activeStains = targetLayer.getElementsByClassName('tomato-splatter-node');
+            if (activeStains.length > 25) {
+                activeStains[0].remove();
+            }
+
+            setTimeout(() => { 
+                if (splatDiv.parentNode) splatDiv.remove(); 
+            }, 3500);
+        }
+
+        // PERBAIKAN UTAMA: Lemparan meluncur dari bawah layar tepat menuju target koordinat kursor mouse
+        function createThrowAnimationPerspective(clientX, clientY, targetContainer, targetX, targetY, isCircleBound) {
+            const clickArea = document.getElementById('click-area');
+            const areaRect = clickArea.getBoundingClientRect();
+            
+            // TITIK AWAL: Bagian tengah bawah kontainer klik area
+            const startX = areaRect.width / 2;
+            const startY = areaRect.height + 50;
+
+            const tomatoMesh = document.createElement('div');
+            tomatoMesh.className = 'flying-tomato';
+            tomatoMesh.innerText = '🍅';
+            
+            tomatoMesh.style.setProperty('--sx', startX + 'px');
+            tomatoMesh.style.setProperty('--sy', startY + 'px');
+            
+            // TITIK AKHIR: Menggunakan koordinat klik relatif area kontainer
+            tomatoMesh.style.setProperty('--tx', targetX + 'px');
+            tomatoMesh.style.setProperty('--ty', targetY + 'px');
+            tomatoMesh.style.setProperty('--rot', (Math.random() - 0.5) * 720 + 'deg');
+
+            clickArea.appendChild(tomatoMesh);
+
+            // Saat animasi meluncur selesai (0.35 detik), picu cipratan hancur di target layer yang tepat
+            setTimeout(() => {
+                tomatoMesh.remove();
+                
+                if (isCircleBound) {
+                    // Jika menabrak lingkaran gambar kustom, taruh di overlay layer khusus di atas foto tokoh
+                    const circleOverlay = document.getElementById('circle-splat-layer');
+                    const circleRect = document.getElementById('main-click-target').getBoundingClientRect();
+                    
+                    // Konversi koordinat global kursor menjadi koordinat relatif lokal lingkaran dalam gambar
+                    const relativeCircleX = clientX - circleRect.left;
+                    const relativeCircleY = clientY - circleRect.top;
+                    
+                    triggerSplatVFX(circleOverlay, relativeCircleX, relativeCircleY, true);
+                } else {
+                    // Jika meleset di luar lingkaran hitam, terciprat di background area klik umum
+                    triggerSplatVFX(clickArea, targetX, targetY, false);
+                }
+            }, 350);
+        }
+
+        function triggerFloatingTextIncome(targetX, targetY, messageText) {
+            const clickArea = document.getElementById('click-area');
+            const textElement = document.createElement('div');
+            textElement.className = 'floating-text';
+            textElement.innerText = messageText;
+            
+            textElement.style.left = `${targetX}px`;
+            textElement.style.top = `${targetY}px`;
+            textElement.style.transform = `translateX(${(Math.random() - 0.5) * 50}px)`;
+
+            clickArea.appendChild(textElement);
+            setTimeout(() => textElement.remove(), 650);
+        }
+
+        // --- GAMEPLAY CORE ENGINE EXECUTOR TRUETARGET ---
+        function executeCoreClickGameplay(e, isAutoTriggered = false) {
+            const clickArea = document.getElementById('click-area');
+            const mainCircle = document.getElementById('main-click-target');
+            
+            const areaRect = clickArea.getBoundingClientRect();
+            const circleRect = mainCircle.getBoundingClientRect();
+
+            let clickClientX = 0;
+            let clickClientY = 0;
+            let targetXInArea = areaRect.width / 2;
+            let targetYInArea = areaRect.height / 2;
+            let isInsideCircle = false;
+
+            if (e && e.clientX && e.clientY) {
+                // INPUT MANUSIA: Deteksi koordinat kursor mouse murni
+                clickClientX = e.clientX;
+                clickClientY = e.clientY;
+                
+                targetXInArea = clickClientX - areaRect.left;
+                targetYInArea = clickClientY - areaRect.top;
+                
+                // Cek apakah koordinat klik berada di dalam jangkauan fisik lingkaran target
+                const circleCenterX = circleRect.left + (circleRect.width / 2);
+                const circleCenterY = circleRect.top + (circleRect.height / 2);
+                const distance = Math.sqrt(Math.pow(clickClientX - circleCenterX, 2) + Math.pow(clickClientY - circleCenterY, 2));
+                
+                if (distance <= (circleRect.width / 2)) {
+                    isInsideCircle = true;
+                }
+            } else if (isAutoTriggered) {
+                // AUTOMATED BOT: Menyerang acak area internal lingkaran target
+                const randomRadius = Math.random() * (circleRect.width / 2 - 10);
+                const randomAngle = Math.random() * Math.PI * 2;
+                
+                const circleCenterX = circleRect.left + (circleRect.width / 2);
+                const circleCenterY = circleRect.top + (circleRect.height / 2);
+                
+                clickClientX = circleCenterX + Math.cos(randomAngle) * randomRadius;
+                clickClientY = circleCenterY + Math.sin(randomAngle) * randomRadius;
+                
+                targetXInArea = clickClientX - areaRect.left;
+                targetYInArea = clickClientY - areaRect.top;
+                isInsideCircle = true;
+                
+                game.stats.totalAutomatedClicks++;
+            }
+
+            // Eksekusi animasi lemparan proyektil tepat mengarah ke titik kursor
+            createThrowAnimationPerspective(clickClientX, clickClientY, clickArea, targetXInArea, targetYInArea, isInsideCircle);
+
+            // Kalkulasi kalkulator income matematika hanya jika lemparan mengenai sasaran target lingkaran
+            if (isInsideCircle) {
+                if (!isAutoTriggered) {
+                    game.stats.totalManualClicks++;
+                }
+
+                let basePower = calculateClickPower();
+                let isCritical = false;
+
+                if (game.actives.bullsEye && Math.random() < 0.15) {
+                    basePower *= 5;
+                    isCritical = true;
+                }
+
+                if (game.actives.fasterThrow && Math.random() < 0.10) {
+                    basePower *= 2;
+                }
+
+                game.tomatoes += basePower;
+                game.stats.totalLifetimeTomatoes += basePower;
+
+                const logMsg = (isCritical ? '🔥 CRIT! +' : '+') + formatNumber(basePower);
+                triggerFloatingTextIncome(targetXInArea, targetYInArea - 20, logMsg);
+
+                if (isAutoTriggered && Math.random() < 0.20) {
+                    const pulse = document.createElement('div');
+                    pulse.className = 'autoclicker-pulse';
+                    mainCircle.appendChild(pulse);
+                    setTimeout(() => pulse.remove(), 500);
+                }
+            } else {
+                // Indikasi pemberitahuan jika lemparan kursor melesat di luar bulatan
+                triggerFloatingTextIncome(targetXInArea, targetYInArea, "MISS 💨");
+            }
+
+            runAchievementCheckRoutines();
+            updateUI();
+        }
+
+        // --- CONTROLLER EVENT LISTENER BINDINGS ---
+        
+        // Klik dipicu di seluruh container click-area agar meluncur ke posisi kursor di manapun diklik
+        document.getElementById('click-area').addEventListener('mousedown', function(e) {
+            // Abaikan jika pemicu berasal dari klik tombol input file / reset progres
+            if (e.target.closest('.upload-section') || e.target.closest('.rebirth-panel')) return;
+            
+            executeCoreClickGameplay(e, false);
+            saveGame();
+        });
+
+        // REBIRTH SYSTEM TRIGGER EXECUTOR
+        document.getElementById('rebirth-button').addEventListener('click', function() {
+            const rewardTokens = getRebirthGain();
+            if (rewardTokens > 0 && confirm(`Apakah Anda bersedia melebur semua aset normal demi ${rewardTokens} Ascendent Tomato?`)) {
+                
+                game.ascendentTomatoes += rewardTokens;
+                game.stats.totalRebirthsCount++;
+                
+                const subsidyLvl = game.permanentUpgrades.heavenlySubsidy || 0;
+                game.tomatoes = subsidyLvl * 5000;
+                
+                game.fineIDoItMyselfMultiplier = 1;
+                game.autoClickerLevel = 0;
+                
+                Object.keys(game.actives).forEach(key => game.actives[key] = false);
+                Object.keys(game.passives).forEach(key => game.passives[key] = 0);
+                
+                // Bersihkan noda sisa run sebelumnya dari layar overlay gambar tokoh
+                document.getElementById('circle-splat-layer').innerHTML = '';
+                
+                reinitializeAutoClickerEngine();
+                runAchievementCheckRoutines();
+                updateUI();
+                saveGame();
+                alert("Transendensi Berhasil! Jiwa melempar Anda meningkat ke tingkatan baru!");
+            }
+        });
+
+        // ABSOLUTE HARD CORRUPT STORAGE RESET PURGE
+        document.getElementById('reset-button').addEventListener('click', function() {
+            if (confirm("⚠️ PERINGATAN: Ini akan menghapus data progres total, badges, serta gambar tokoh selamanya! Anda yakin?")) {
+                
+                localStorage.removeItem('tomato_hyperion_save_state');
+                localStorage.removeItem('tomato_hyperion_saved_avatar_img');
+                
+                game = {
+                    tomatoes: 0, ascendentTomatoes: 0, fineIDoItMyselfMultiplier: 1, autoClickerLevel: 0,
+                    stats: { totalLifetimeTomatoes: 0, totalManualClicks: 0, totalAutomatedClicks: 0, totalRebirthsCount: 0 },
+                    actives: { largerHand: false, fasterThrow: false, tomatoGun: false, leftHand: false, machineGun: false, mutation: false, bullsEye: false, artificialRain: false, fineIDoItMyself: false, nuclearSplatter: false, dimensionalGlove: false, infinitySplat: false },
+                    passives: { thrower: 0, tripleThrower: 0, gatling: 0, farm: 0, factory: 0, rain: 0, storm: 0, disaster: 0, catastrophe: 0, apocalypse: 0, galacticHarvest: 0, realityFolder: 0 },
+                    permanentUpgrades: { goldenSeeds: 0, ancestralJuicer: 0, heavenlySubsidy: 0, efficientFarming: 0, hyperDrive: 0 },
+                    unlockedAchievements: { firstSplat: false, tomatoMillionaire: false, clickAddict: false, rebirthAscension: false, industrialist: false, automationGod: false, billionaireClub: false, cosmicHarvester: false }
+                };
+
+                const imgElement = document.getElementById('custom-avatar');
+                imgElement.src = "";
+                imgElement.style.display = 'none';
+                
+                document.getElementById('circle-splat-layer').innerHTML = '';
+
+                reinitializeAutoClickerEngine();
+                updateUI();
+                alert("Database memori game disetel ulang ke titik pabrikan nol murni!");
+            }
+        });
+
+        // CONVERT IMAGE FILE INPUT TARGET INTO STABLE BASE64 DATA STRING
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            const uploadedFile = e.target.files[0];
+            if (uploadedFile) {
+                if (uploadedFile.size > 3.5 * 1024 * 1024) {
+                    alert("Berkas terlalu besar! Gunakan kompresi gambar di bawah 3.5 MB.");
+                    return;
+                }
+
+                const fileReaderInstance = new FileReader();
+                fileReaderInstance.onload = function(eventResult) {
+                    const base64DataString = eventResult.target.result;
+                    
+                    localStorage.setItem('tomato_hyperion_saved_avatar_img', base64DataString);
+                    
+                    const imgElement = document.getElementById('custom-avatar');
+                    imgElement.src = base64DataString;
+                    imgElement.style.display = 'block';
+                };
+                fileReaderInstance.readAsDataURL(uploadedFile);
+            }
+        });
+
+        // --- SYSTEM AUTOMATIC PRODUCTION BACKGROUND TICK INTERVAL LOOP ---
+        setInterval(function() {
+            let corePassiveIncome = 0;
+            PASSIVE_DB.forEach(p => { 
+                corePassiveIncome += game.passives[p.id] * p.cps; 
+            });
+
+            if (game.actives.fineIDoItMyself) corePassiveIncome *= 3;
+            if (game.actives.artificialRain) corePassiveIncome *= 2;
+
+            const finalMultiplier = (1 + (game.ascendentTomatoes * 0.50)) * getPermanentShopMultiplier();
+            const absoluteTpsValue = corePassiveIncome * finalMultiplier;
+
+            // Tick berjalan setiap 500ms, tambahkan setengah nominal TPS ke akun saldo dompet
+            const earnedIncome = absoluteTpsValue * 0.5;
+            game.tomatoes += earnedIncome;
+            game.stats.totalLifetimeTomatoes += earnedIncome;
+            
+            runAchievementCheckRoutines();
+            updateUI();
+        }, 500);
+
+        // Auto Save cadangan rutin berkala otomatis setiap 15 detik sekali
+        setInterval(saveGame, 15000);
+
+        // --- RUN INITIAL APPLICATION BOOTSTRAPPER ---
+        loadGame();
+        updateUI();
+    </script>
+</body>
+</html>
