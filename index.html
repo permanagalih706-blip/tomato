@@ -588,6 +588,13 @@
             animation: floatUpAnimationCrit 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
         }
 
+        .floating-text.golden-text {
+            font-size: 2rem;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.9);
+            animation: floatUpAnimationGolden 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
         @keyframes floatUpAnimation {
             0% { opacity: 1; transform: translateY(0) scale(1.1); }
             100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
@@ -597,6 +604,12 @@
             0% { opacity: 1; transform: translateY(0) scale(0.6) rotate(-6deg); }
             25% { transform: translateY(-15px) scale(1.35) rotate(4deg); }
             100% { opacity: 0; transform: translateY(-95px) scale(0.9) rotate(0deg); }
+        }
+
+        @keyframes floatUpAnimationGolden {
+            0% { opacity: 1; transform: translateY(0) scale(0.5) rotate(-10deg); }
+            30% { transform: translateY(-20px) scale(1.5) rotate(10deg); }
+            100% { opacity: 0; transform: translateY(-100px) scale(1.1) rotate(0deg); }
         }
 
         .flying-tomato {
@@ -616,6 +629,16 @@
             100% { left: var(--tx); top: var(--ty); transform: scale(1) rotate(var(--rot)); }
         }
 
+        .flying-golden-tomato {
+            position: absolute;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 99;
+            animation: throwDirectToCursor 0.4s cubic-bezier(0.2, 1, 0.4, 1) forwards;
+            transform-origin: center center;
+            filter: drop-shadow(0 0 15px rgba(255,215,0,0.9));
+        }
+
         .tomato-trail {
             position: absolute;
             width: 6px;
@@ -626,6 +649,11 @@
             z-index: 97;
             opacity: 0.5;
             animation: trailFadeOut 0.4s ease-out forwards;
+        }
+
+        .golden-trail {
+            background: #ffd700;
+            box-shadow: 0 0 6px #ffd700;
         }
 
         @keyframes trailFadeOut {
@@ -648,6 +676,11 @@
             fill: #c60c1e;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.6));
             animation: stainDripFade 3.5s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+        }
+
+        .golden-splat .splat-svg-graphic {
+            fill: #ffd700;
+            filter: drop-shadow(0px 2px 8px rgba(255,215,0,0.6));
         }
 
         @keyframes burstShockwave {
@@ -673,6 +706,11 @@
             animation: juiceFly 0.55s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
         }
 
+        .golden-juice {
+            background: #ffd700;
+            box-shadow: 0 0 6px #ffd700;
+        }
+
         @keyframes juiceFly {
             0% { opacity: 1; transform: translate(-50%, -50%) translate(0, 0) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -50%) translate(var(--jx), var(--jy)) scale(0.3); }
@@ -693,29 +731,7 @@
         }
 
         /* ==============================
-           11. GOLDEN TOMATO
-           ============================== */
-        .golden-tomato {
-            position: absolute;
-            font-size: 2.2rem;
-            cursor: pointer;
-            z-index: 200;
-            filter: drop-shadow(0 0 12px rgba(255,183,3,0.85));
-            animation: goldenBob 1.4s ease-in-out infinite, goldenAppear 0.4s ease-out;
-            transition: transform 0.15s ease;
-        }
-        .golden-tomato:hover { transform: scale(1.15); }
-        @keyframes goldenBob {
-            0%, 100% { transform: translateY(0) rotate(-8deg); }
-            50% { transform: translateY(-10px) rotate(8deg); }
-        }
-        @keyframes goldenAppear {
-            0% { opacity: 0; transform: scale(0.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        /* ==============================
-           12. MODALS
+           11. MODALS
            ============================== */
         .modal-overlay {
             position: fixed;
@@ -797,7 +813,7 @@
         }
 
         /* ==============================
-           13. TOAST NOTIFICATIONS
+           12. TOAST NOTIFICATIONS
            ============================== */
         .toast-stack {
             position: fixed;
@@ -845,7 +861,7 @@
         }
 
         /* ==============================
-           14. SETTINGS & ADMIN
+           13. SETTINGS & ADMIN
            ============================== */
         .settings-fab {
             position: fixed;
@@ -964,7 +980,7 @@
         }
 
         /* ==============================
-           15. RESPONSIVE
+           14. RESPONSIVE
            ============================== */
         @media (max-width: 1024px) {
             body { overflow-y: auto; }
@@ -997,7 +1013,7 @@
                     <div class="stat-line"><span>Kekuatan Klik:</span><span class="stat-value" id="click-power-value">1</span></div>
                     <div class="stat-line"><span>Auto-Clicker:</span><span class="stat-value" id="ac-speed-value" style="color: var(--accent-green);">OFF</span></div>
                     <div class="stat-line"><span>Ascendent Tomato:</span><span class="stat-value" id="ascendent-value" style="color: var(--accent-gold);">0</span></div>
-                    <div class="stat-line"><span>Bonus Permanen:</span><span class="stat-value" id="perm-bonus-value" style="color: var(--accent-gold);">+0%</span></div>
+                    <div class="stat-line"><span>Bonus Ascendant:</span><span class="stat-value" id="perm-bonus-value" style="color: var(--accent-gold);">+0%</span></div>
                 </div>
             </div>
 
@@ -1027,13 +1043,13 @@
             </div>
         </div>
 
-        <!-- ========== KOLOM 2: ACTIVE & AUTO ========== -->
+        <!-- ========== KOLOM 2: ACTIVE & SUPER ========== -->
         <div class="column">
             <div class="column-header-sticky">
                 <div class="column-title"><span>⚡ Active Modifiers</span></div>
                 <div class="shop-tabs">
                     <button class="tab-button active" onclick="switchTab('active', 'normal-active')">Upgrades</button>
-                    <button class="tab-button" onclick="switchTab('active', 'autoclicker-pane')">Auto-Clickers</button>
+                    <button class="tab-button" onclick="switchTab('active', 'super-pane')">Super</button>
                 </div>
             </div>
 
@@ -1041,8 +1057,10 @@
                 <div class="upgrade-list" id="active-upgrades-container"></div>
             </div>
 
-            <div id="autoclicker-pane" class="shop-pane">
+            <div id="super-pane" class="shop-pane">
+                <div class="upgrade-list" id="stronger-throw-container"></div>
                 <div class="upgrade-list" id="autoclicker-upgrades-container"></div>
+                <div class="upgrade-list" id="super-upgrades-container"></div>
             </div>
         </div>
 
@@ -1201,12 +1219,18 @@
                 totalLifetimeTomatoes: 0,
                 totalManualClicks: 0,
                 totalAutomatedClicks: 0,
-                totalRebirthsCount: 0
+                totalRebirthsCount: 0,
+                lastClickTime: 0,
+                clickStreak: 0
             },
             actives: {
-                largerHand: false, fasterThrow: false, tomatoGun: false, leftHand: false,
-                machineGun: false, mutation: false, bullsEye: false, artificialRain: false,
-                fineIDoItMyself: false, nuclearSplatter: false, dimensionalGlove: false, infinitySplat: false
+                largerHand: false, tomatoGun: false, leftHand: false,
+                machineGun: false, mutation: false, nuclearSplatter: false,
+                dimensionalGlove: false, infinitySplat: false
+            },
+            superUpgrades: {
+                fasterThrow: false, bullsEye: false, artificialRain: false,
+                fineIDoItMyself: false
             },
             passives: {
                 thrower: 0, tripleThrower: 0, gatling: 0, farm: 0, factory: 0,
@@ -1214,9 +1238,13 @@
                 galacticHarvest: 0, realityFolder: 0
             },
             autoClickerLevel: 0,
+            strongerThrowLevel: 0,
             permanentUpgrades: {
-                goldenSeeds: 0, ancestralJuicer: 0, heavenlySubsidy: 0,
-                efficientFarming: 0, hyperDrive: 0
+                freshStart: 0,
+                clickingFrenzy: 0,
+                upgradeEfficiency: 0,
+                secondLifePrifilage: 0,
+                goldenTomato: 0
             },
             unlockedAchievements: {
                 firstSplat: false, tomatoMillionaire: false, clickAddict: false,
@@ -1230,17 +1258,20 @@
         // ============================================================
         const ACTIVE_DB = [
             { id: 'largerHand', name: 'Larger Hand', cost: 50, desc: 'Memperluas genggaman tangan.', effect: '+1 tomat / klik' },
-            { id: 'fasterThrow', name: 'Faster Throw™', cost: 250, desc: 'Kecepatan refleks tinggi.', effect: '10% peluang 2x klik' },
             { id: 'tomatoGun', name: 'Tomato Gun', cost: 1500, desc: 'Pistol pelontar tomat.', effect: '+4 tomat / klik' },
             { id: 'leftHand', name: 'Left Hand', cost: 8000, desc: 'Melatih tangan kiri.', effect: '+8 tomat / klik' },
             { id: 'machineGun', name: 'Machine Gun', cost: 35000, desc: 'Senjata otomatis tomat.', effect: '+25 tomat / klik' },
             { id: 'mutation', name: 'Biochemical Mutation', cost: 120000, desc: 'Mutasi otot tangan.', effect: '+60 tomat / klik' },
-            { id: 'bullsEye', name: 'Bull\'s Eye Precision', cost: 450000, desc: 'Akurasi mematikan.', effect: '+15% peluang Critical (5x)' },
-            { id: 'artificialRain', name: 'Weather Controller', cost: 1500000, desc: 'Hujan buatan.', effect: '2x TPS' },
             { id: 'nuclearSplatter', name: 'Nuclear Splat', cost: 8000000, desc: 'Tomat reaktor nuklir.', effect: '+250 tomat / klik' },
             { id: 'dimensionalGlove', name: 'Dimensional Glove', cost: 45000000, desc: 'Sarung tangan kosmik.', effect: '+1.500 tomat / klik' },
-            { id: 'fineIDoItMyself', name: 'Fine, I\'ll Do It Myself', cost: 250000000, desc: 'Efisiensi mutlak.', effect: '3x TPS & Klik Dasar' },
             { id: 'infinitySplat', name: 'Infinity Splatter', cost: 2000000000, desc: 'Energi singularitas.', effect: '+15.000 tomat / klik' }
+        ];
+
+        const SUPER_DB = [
+            { id: 'fasterThrow', name: 'Faster Throw™', cost: 250, desc: 'Kecepatan refleks tinggi.', effect: '10% peluang 2x klik' },
+            { id: 'bullsEye', name: 'Bull\'s Eye Precision', cost: 450000, desc: 'Akurasi mematikan.', effect: '+15% peluang Critical (5x)' },
+            { id: 'artificialRain', name: 'Weather Controller', cost: 1500000, desc: 'Hujan buatan.', effect: '2x TPS' },
+            { id: 'fineIDoItMyself', name: 'Fine, I\'ll Do It Myself', cost: 250000000, desc: 'Efisiensi mutlak.', effect: '3x TPS & Klik Dasar' }
         ];
 
         const PASSIVE_DB = [
@@ -1270,13 +1301,54 @@
             { level: 9, cost: 600000000, cpsRate: 100, desc: 'Dewa Overclocking.' }
         ];
 
+        // ============================================================
+        // NEW REBIRTH SHOP DATABASE
+        // ============================================================
         const PERMANENT_SHOP_DB = [
-            { id: 'goldenSeeds', name: 'Golden Mythic Seeds', cost: 1, max: 20, desc: 'Benih abadi purba.', effect: '+25% TPS Global per level' },
-            { id: 'ancestralJuicer', name: 'Ancestral Juicer', cost: 2, max: 15, desc: 'Alat peras pusaka.', effect: '+5 Klik Power Dasar per level' },
-            { id: 'heavenlySubsidy', name: 'Heavenly Subsidy', cost: 3, max: 10, desc: 'Dukungan dewa tomat.', effect: '+5.000 Tomat awal per level' },
-            { id: 'efficientFarming', name: 'Efficient Ledger', cost: 2, max: 10, desc: 'Buku akuntansi taktis.', effect: 'Diskon 5% biaya belanja per level' },
-            { id: 'hyperDrive', name: 'Quantum Hyperdrive', cost: 5, max: 2, desc: 'Sistem tachyon.', effect: '2x Auto-Clicker Speed per level' }
+            { 
+                id: 'freshStart', 
+                name: 'Fresh Start', 
+                cost: 2, 
+                max: 10, 
+                desc: 'Awal baru yang lebih kuat setelah Rebirth.', 
+                effect: '+1.000 tomat awal per level (saat rebirth)' 
+            },
+            { 
+                id: 'clickingFrenzy', 
+                name: 'Clicking Frenzy', 
+                cost: 50, 
+                max: 1, 
+                desc: 'Setiap klik beruntun memberikan bonus 0.01% untuk klik berikutnya.', 
+                effect: 'Bonus berhenti jika idle 3 detik (auto-clicker tidak berlaku)' 
+            },
+            { 
+                id: 'upgradeEfficiency', 
+                name: 'Upgrade Efficiency', 
+                cost: 4, 
+                max: 10, 
+                desc: 'Semua upgrade senjata tomat per klik 10% lebih efektif.', 
+                effect: '+10% efektivitas per level' 
+            },
+            { 
+                id: 'secondLifePrifilage', 
+                name: 'Second Life Prifilage', 
+                cost: 1, 
+                max: 25, 
+                desc: 'Diskon untuk semua pembelian.', 
+                effect: '+1% diskon per level (kecuali Rebirth Shop)' 
+            },
+            { 
+                id: 'goldenTomato', 
+                name: 'Golden Tomato', 
+                cost: 6, 
+                max: 8, 
+                desc: 'Meningkatkan peluang lemparan Golden Tomato (hanya aktif setelah Rebirth pertama).', 
+                effect: '+5% peluang per level (10x nilai tomat)' 
+            }
         ];
+
+        // Stronger Throw: leveled active-tab upgrade (separate from Upgrade Efficiency)
+        const STRONGER_THROW_CONFIG = { baseCost: 5000, growth: 2.5, max: 10, bonusPerLevel: 0.10 };
 
         const ACHIEVEMENTS_DB = [
             { id: 'firstSplat', name: 'First Blood Splat', desc: 'Klik manual pertama.', conditionStr: '1 Klik Manual' },
@@ -1296,17 +1368,22 @@
         let afkPopupShown = false;
         let idleCheckTimerId = null;
         let adminKeyBuffer = '';
-        let goldenTomatoSpawnTimerId = null;
-        let goldenTomatoDespawnTimerId = null;
-        let goldenTomatoFrenzyUntil = 0;
         const OFFLINE_EARNING_EFFICIENCY = 0.5;
         const OFFLINE_CAP_SECONDS = 8 * 3600;
+        let lastClickTime = 0;
+        let clickStreak = 0;
 
         // ============================================================
         // 3. UTILITY FUNCTIONS
         // ============================================================
         function formatNumber(num) {
             if (num === Infinity) return 'MAX';
+            if (num < 0) return '-' + formatNumber(-num);
+            if (num >= 1e27) return num.toExponential(2).replace('e+', 'e');
+            if (num >= 1e24) return (num / 1e24).toFixed(2) + ' Sp';
+            if (num >= 1e21) return (num / 1e21).toFixed(2) + ' Sx';
+            if (num >= 1e18) return (num / 1e18).toFixed(2) + ' Qn';
+            if (num >= 1e15) return (num / 1e15).toFixed(2) + ' Qa';
             if (num >= 1e12) return (num / 1e12).toFixed(2) + ' T';
             if (num >= 1e9) return (num / 1e9).toFixed(2) + ' B';
             if (num >= 1e6) return (num / 1e6).toFixed(2) + ' M';
@@ -1326,8 +1403,8 @@
         }
 
         function getDiscountFactor() {
-            const level = game.permanentUpgrades.efficientFarming || 0;
-            return 1 - (level * 0.05);
+            const level = game.permanentUpgrades.secondLifePrifilage || 0;
+            return 1 - (level * 0.01);
         }
 
         function getPassiveCost(id) {
@@ -1340,6 +1417,10 @@
             return Math.floor(config.cost * getDiscountFactor());
         }
 
+        function getSuperCost(config) {
+            return Math.floor(config.cost * getDiscountFactor());
+        }
+
         function getAutoClickerCost() {
             const nextLevel = game.autoClickerLevel + 1;
             const config = AUTOCLICKER_DB.find(a => a.level === nextLevel);
@@ -1348,17 +1429,45 @@
         }
 
         function getRebirthGain() {
+            // Cube-root scaling so accumulated tomatoes don't translate into an
+            // instant, game-breaking amount of Ascendent Tomatoes.
             if (game.tomatoes < REBIRTH_REQUIREMENT) return 0;
-            return Math.floor(game.tomatoes / REBIRTH_REQUIREMENT);
+            return Math.floor(Math.cbrt(game.tomatoes / REBIRTH_REQUIREMENT));
         }
 
-        function getPermanentShopMultiplier() {
-            const level = game.permanentUpgrades.goldenSeeds || 0;
-            return 1 + (level * 0.25);
+        function getAscendentMultiplier() {
+            // Diminishing-returns curve instead of flat +50% per point,
+            // so Ascendent Tomatoes stay valuable without causing runaway growth.
+            const at = game.ascendentTomatoes || 0;
+            return 1 + 0.1 * Math.sqrt(at);
+        }
+
+        function getUpgradeEfficiencyMultiplier() {
+            const level = game.permanentUpgrades.upgradeEfficiency || 0;
+            return 1 + (level * 0.1);
+        }
+
+        function getGoldenTomatoChance() {
+            const level = game.permanentUpgrades.goldenTomato || 0;
+            return level * 0.05;
+        }
+
+        // Rebirth Shop costs scale up per level so maxing out isn't trivial.
+        // Single-purchase items (max === 1, e.g. Clicking Frenzy) stay at a flat, high price.
+        function getPermanentUpgradeCost(up) {
+            const currentLvl = game.permanentUpgrades[up.id] || 0;
+            if (up.max === 1) return up.cost;
+            return Math.floor(up.cost * (currentLvl + 1));
+        }
+
+        function getStrongerThrowCost() {
+            const lvl = game.strongerThrowLevel || 0;
+            if (lvl >= STRONGER_THROW_CONFIG.max) return Infinity;
+            return Math.floor(STRONGER_THROW_CONFIG.baseCost * Math.pow(STRONGER_THROW_CONFIG.growth, lvl) * getDiscountFactor());
         }
 
         function calculateClickPower() {
-            let baseClick = 1 + ((game.permanentUpgrades.ancestralJuicer || 0) * 5);
+            let baseClick = 1;
             if (game.actives.largerHand) baseClick += 1;
             if (game.actives.tomatoGun) baseClick += 4;
             if (game.actives.leftHand) baseClick += 8;
@@ -1367,18 +1476,51 @@
             if (game.actives.nuclearSplatter) baseClick += 250;
             if (game.actives.dimensionalGlove) baseClick += 1500;
             if (game.actives.infinitySplat) baseClick += 15000;
-            baseClick *= game.fineIDoItMyselfMultiplier;
-            let finalPower = baseClick * (1 + (game.ascendentTomatoes * 0.50));
-            if (Date.now() < goldenTomatoFrenzyUntil) finalPower *= 7;
-            return Math.floor(finalPower);
+
+            // Apply upgrade efficiency (Rebirth Shop: makes weapon upgrades stronger)
+            const effMult = getUpgradeEfficiencyMultiplier();
+            baseClick *= effMult;
+
+            // Stronger Throw (new active-tab leveled upgrade, +10% per level)
+            const strongerLvl = game.strongerThrowLevel || 0;
+            baseClick *= (1 + strongerLvl * STRONGER_THROW_CONFIG.bonusPerLevel);
+
+            // Apply Fine, I'll Do It Myself
+            if (game.superUpgrades.fineIDoItMyself) {
+                baseClick *= 3;
+            }
+
+            // Ascendent bonus (diminishing returns, see getAscendentMultiplier)
+            baseClick *= getAscendentMultiplier();
+
+            // Clicking Frenzy bonus (manual clicks only - checked/reset in the click engine)
+            if (game.permanentUpgrades.clickingFrenzy > 0) {
+                const now = Date.now();
+                if (now - game.stats.lastClickTime < 3000) {
+                    const bonus = game.stats.clickStreak * 0.0001;
+                    baseClick *= (1 + bonus);
+                } else {
+                    game.stats.clickStreak = 0;
+                }
+            }
+
+            return Math.max(1, Math.floor(baseClick));
         }
 
         function calculateTotalTPS() {
             let totalCps = 0;
             PASSIVE_DB.forEach(p => { totalCps += game.passives[p.id] * p.cps; });
-            if (game.actives.fineIDoItMyself) totalCps *= 3;
-            if (game.actives.artificialRain) totalCps *= 2;
-            totalCps *= (1 + (game.ascendentTomatoes * 0.50)) * getPermanentShopMultiplier();
+            if (game.superUpgrades.fineIDoItMyself) totalCps *= 3;
+            if (game.superUpgrades.artificialRain) totalCps *= 2;
+            totalCps *= getAscendentMultiplier();
+            // Auto-clicker: pure passive income equal to 80% of one click's worth,
+            // fired at its cpsRate - it never simulates a real click.
+            if (game.autoClickerLevel > 0) {
+                const acConfig = AUTOCLICKER_DB.find(a => a.level === game.autoClickerLevel);
+                if (acConfig) {
+                    totalCps += acConfig.cpsRate * calculateClickPower() * 0.8;
+                }
+            }
             return totalCps;
         }
 
@@ -1403,6 +1545,7 @@
                         previousSaveTime = parsed.lastSaveTime || null;
                         game = { ...game, ...parsed };
                         if (parsed.actives) game.actives = { ...game.actives, ...parsed.actives };
+                        if (parsed.superUpgrades) game.superUpgrades = { ...game.superUpgrades, ...parsed.superUpgrades };
                         if (parsed.passives) game.passives = { ...game.passives, ...parsed.passives };
                         if (parsed.permanentUpgrades) game.permanentUpgrades = { ...game.permanentUpgrades, ...parsed.permanentUpgrades };
                         if (parsed.unlockedAchievements) game.unlockedAchievements = { ...game.unlockedAchievements, ...parsed.unlockedAchievements };
@@ -1477,7 +1620,7 @@
             document.getElementById('tps-value').innerText = formatNumber(calculateTotalTPS());
             document.getElementById('click-power-value').innerText = formatNumber(calculateClickPower());
             document.getElementById('ascendent-value').innerText = game.ascendentTomatoes;
-            document.getElementById('perm-bonus-value').innerText = `+${((getPermanentShopMultiplier() - 1) * 100).toFixed(0)}%`;
+            document.getElementById('perm-bonus-value').innerText = `+${Math.round((getAscendentMultiplier() - 1) * 100)}%`;
 
             const acSpeed = document.getElementById('ac-speed-value');
             if (game.autoClickerLevel <= 0) {
@@ -1485,10 +1628,10 @@
                 acSpeed.style.color = "var(--text-muted)";
             } else {
                 const currentAC = AUTOCLICKER_DB.find(a => a.level === game.autoClickerLevel);
-                let speed = currentAC.cpsRate;
-                if (game.permanentUpgrades.hyperDrive > 0) speed *= (1 + game.permanentUpgrades.hyperDrive);
-                acSpeed.innerText = `${speed} Klik/Dtk`;
-                acSpeed.style.color = "var(--accent-green)";
+                if (currentAC) {
+                    acSpeed.innerText = `${currentAC.cpsRate} Klik/Dtk`;
+                    acSpeed.style.color = "var(--accent-green)";
+                }
             }
 
             const gain = getRebirthGain();
@@ -1514,6 +1657,27 @@
                     </button>
                 `;
                 activeContainer.appendChild(card);
+            });
+
+            // Super Upgrades
+            const superContainer = document.getElementById('super-upgrades-container');
+            superContainer.innerHTML = '';
+            SUPER_DB.forEach(up => {
+                const isBought = game.superUpgrades[up.id];
+                const realCost = getSuperCost(up);
+                const card = document.createElement('div');
+                card.className = `upgrade-card ${isBought ? 'bought' : ''} ${(!isBought && game.tomatoes < realCost) ? 'disabled' : ''}`;
+                card.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">${up.name}</div>
+                        <div class="upgrade-desc">${up.desc}</div>
+                        <div class="upgrade-effect">${up.effect}</div>
+                    </div>
+                    <button class="upgrade-buy-btn" ${isBought || game.tomatoes < realCost ? 'disabled' : ''} onclick="buySuperUpgrade('${up.id}', ${realCost})">
+                        ${isBought ? '✓ DIBELI' : '🍅 ' + formatNumber(realCost)}
+                    </button>
+                `;
+                superContainer.appendChild(card);
             });
 
             // Auto-Clicker
@@ -1571,14 +1735,15 @@
                 passiveContainer.appendChild(card);
             });
 
-            // Permanent Shop
+            // Permanent Shop (NEW)
             const permContainer = document.getElementById('permanent-upgrades-container');
             permContainer.innerHTML = '';
             PERMANENT_SHOP_DB.forEach(up => {
                 const currentLvl = game.permanentUpgrades[up.id] || 0;
                 const isMax = currentLvl >= up.max;
+                const nextCost = getPermanentUpgradeCost(up);
                 const card = document.createElement('div');
-                card.className = `upgrade-card permanent-card ${isMax ? 'bought' : ''} ${(!isMax && game.ascendentTomatoes < up.cost) ? 'disabled' : ''}`;
+                card.className = `upgrade-card permanent-card ${isMax ? 'bought' : ''} ${(!isMax && game.ascendentTomatoes < nextCost) ? 'disabled' : ''}`;
                 card.innerHTML = `
                     ${currentLvl > 0 ? `<div class="passive-count" style="color:var(--accent-gold);">${currentLvl}/${up.max}</div>` : ''}
                     <div class="upgrade-info">
@@ -1586,12 +1751,33 @@
                         <div class="upgrade-desc" style="color:#d9c2c2;">${up.desc}</div>
                         <div class="upgrade-effect">${up.effect}</div>
                     </div>
-                    <button class="upgrade-buy-btn" ${isMax || game.ascendentTomatoes < up.cost ? 'disabled' : ''} onclick="buyPermanentUpgrade('${up.id}', ${up.cost}, ${up.max})">
-                        ${isMax ? 'MAKSIMAL' : '⭐ ' + up.cost}
+                    <button class="upgrade-buy-btn" ${isMax || game.ascendentTomatoes < nextCost ? 'disabled' : ''} onclick="buyPermanentUpgrade('${up.id}')">
+                        ${isMax ? 'MAKSIMAL' : '⭐ ' + nextCost}
                     </button>
                 `;
                 permContainer.appendChild(card);
             });
+
+            // Stronger Throw (leveled, Upgrades tab)
+            const stContainer = document.getElementById('stronger-throw-container');
+            if (stContainer) {
+                const stLvl = game.strongerThrowLevel || 0;
+                const stMax = stLvl >= STRONGER_THROW_CONFIG.max;
+                const stCost = getStrongerThrowCost();
+                stContainer.innerHTML = `
+                    <div class="upgrade-card ${stMax ? 'bought' : ''} ${(!stMax && game.tomatoes < stCost) ? 'disabled' : ''}">
+                        ${stLvl > 0 ? `<div class="passive-count">${stLvl}/${STRONGER_THROW_CONFIG.max}</div>` : ''}
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">💪 Stronger Throw</div>
+                            <div class="upgrade-desc">Lemparan makin kuat tiap level.</div>
+                            <div class="upgrade-effect">+10% tomat / klik per level</div>
+                        </div>
+                        <button class="upgrade-buy-btn" ${stMax || game.tomatoes < stCost ? 'disabled' : ''} onclick="buyStrongerThrow()">
+                            ${stMax ? '✓ MAX' : '🍅 ' + formatNumber(stCost)}
+                        </button>
+                    </div>
+                `;
+            }
 
             // Achievements
             const achContainer = document.getElementById('achievements-container');
@@ -1619,10 +1805,18 @@
             if (game.tomatoes >= cost && !game.actives[id]) {
                 game.tomatoes -= cost;
                 game.actives[id] = true;
+                runAchievementCheckRoutines();
+                updateUI();
+                saveGame();
+            }
+        };
+
+        window.buySuperUpgrade = function(id, cost) {
+            if (game.tomatoes >= cost && !game.superUpgrades[id]) {
+                game.tomatoes -= cost;
+                game.superUpgrades[id] = true;
                 if (id === 'fineIDoItMyself') {
                     game.fineIDoItMyselfMultiplier = 3;
-                    game.tomatoes = Math.floor(game.tomatoes / 2);
-                    Object.keys(game.passives).forEach(k => { game.passives[k] = Math.floor(game.passives[k] / 2); });
                 }
                 runAchievementCheckRoutines();
                 updateUI();
@@ -1652,9 +1846,13 @@
             }
         };
 
-        window.buyPermanentUpgrade = function(id, cost, maxSlot) {
+        window.buyPermanentUpgrade = function(id) {
+            const up = PERMANENT_SHOP_DB.find(p => p.id === id);
+            if (!up) return;
             const currentLvl = game.permanentUpgrades[id] || 0;
-            if (game.ascendentTomatoes >= cost && currentLvl < maxSlot) {
+            if (currentLvl >= up.max) return;
+            const cost = getPermanentUpgradeCost(up);
+            if (game.ascendentTomatoes >= cost) {
                 game.ascendentTomatoes -= cost;
                 game.permanentUpgrades[id] = currentLvl + 1;
                 updateUI();
@@ -1662,8 +1860,21 @@
             }
         };
 
+        window.buyStrongerThrow = function() {
+            const lvl = game.strongerThrowLevel || 0;
+            if (lvl >= STRONGER_THROW_CONFIG.max) return;
+            const cost = getStrongerThrowCost();
+            if (game.tomatoes >= cost) {
+                game.tomatoes -= cost;
+                game.strongerThrowLevel = lvl + 1;
+                runAchievementCheckRoutines();
+                updateUI();
+                saveGame();
+            }
+        };
+
         // ============================================================
-        // 8. AUTO-CLICKER ENGINE
+        // 8. AUTO-CLICKER ENGINE (Passive income based on click power)
         // ============================================================
         function reinitializeAutoClickerEngine() {
             if (autoClickerTimerId) { clearInterval(autoClickerTimerId);
@@ -1671,16 +1882,22 @@
             if (game.autoClickerLevel <= 0) return;
             const currentAC = AUTOCLICKER_DB.find(a => a.level === game.autoClickerLevel);
             if (!currentAC) return;
-            let cpsRate = currentAC.cpsRate;
-            if (game.permanentUpgrades.hyperDrive > 0) cpsRate *= (1 + game.permanentUpgrades.hyperDrive);
-            const interval = 1000 / cpsRate;
+            const interval = 1000 / currentAC.cpsRate;
             autoClickerTimerId = setInterval(() => {
-                executeCoreClickGameplay(null, true);
+                // Auto-clicker generates passive income based on click power
+                const power = calculateClickPower();
+                const earned = Math.floor(power * 0.8); // 80% of click power
+                game.tomatoes += earned;
+                game.stats.totalLifetimeTomatoes += earned;
+                game.stats.totalAutomatedClicks++;
+                runAchievementCheckRoutines();
+                updateUI();
+                saveGame();
             }, interval);
         }
 
         // ============================================================
-        // 9. CORE CLICK ENGINE
+        // 9. CORE CLICK ENGINE with Golden Tomato
         // ============================================================
         function executeCoreClickGameplay(e, isAutoTriggered = false) {
             const clickArea = document.getElementById('click-area');
@@ -1717,11 +1934,19 @@
             }
 
             // Throw animation
-            createThrowAnimation(clickClientX, clickClientY, clickArea, targetXInArea, targetYInArea, isInsideCircle);
+            createThrowAnimation(clickClientX, clickClientY, clickArea, targetXInArea, targetYInArea, isInsideCircle, false);
 
             if (isInsideCircle) {
                 if (!isAutoTriggered) {
                     game.stats.totalManualClicks++;
+                    // Update click streak for frenzy
+                    const now = Date.now();
+                    if (now - game.stats.lastClickTime < 3000) {
+                        game.stats.clickStreak++;
+                    } else {
+                        game.stats.clickStreak = 1;
+                    }
+                    game.stats.lastClickTime = now;
                     mainCircle.classList.remove('squash-hit');
                     void mainCircle.offsetWidth;
                     mainCircle.classList.add('squash-hit');
@@ -1729,15 +1954,28 @@
 
                 let power = calculateClickPower();
                 let isCrit = false;
-                if (game.actives.bullsEye && Math.random() < 0.15) { power *= 5;
+                if (game.superUpgrades.bullsEye && Math.random() < 0.15) { power *= 5;
                     isCrit = true; }
-                if (game.actives.fasterThrow && Math.random() < 0.10) { power *= 2; }
+                if (game.superUpgrades.fasterThrow && Math.random() < 0.10) { power *= 2; }
+
+                // Check for Golden Tomato (only after rebirth)
+                const goldenChance = getGoldenTomatoChance();
+                if (game.stats.totalRebirthsCount > 0 && Math.random() < goldenChance) {
+                    // Golden Tomato! 10x value
+                    power *= 10;
+                    triggerFloatingText(targetXInArea, targetYInArea - 20, '🌟 GOLDEN! +' + formatNumber(power), true, true);
+                    // Golden splat effect
+                    createGoldenSplat(clickClientX, clickClientY);
+                    // Golden throw animation
+                    createThrowAnimation(clickClientX, clickClientY, clickArea, targetXInArea, targetYInArea, isInsideCircle, true);
+                } else {
+                    const msg = (isCrit ? '🔥 CRIT! +' : '+') + formatNumber(power);
+                    triggerFloatingText(targetXInArea, targetYInArea - 20, msg, isCrit, false);
+                    if (isCrit && !isAutoTriggered) triggerScreenShake();
+                }
 
                 game.tomatoes += power;
                 game.stats.totalLifetimeTomatoes += power;
-                const msg = (isCrit ? '🔥 CRIT! +' : '+') + formatNumber(power);
-                triggerFloatingText(targetXInArea, targetYInArea - 20, msg, isCrit);
-                if (isCrit && !isAutoTriggered) triggerScreenShake();
 
                 if (isAutoTriggered && Math.random() < 0.20) {
                     const pulse = document.createElement('div');
@@ -1753,17 +1991,60 @@
             updateUI();
         }
 
+        function createGoldenSplat(clientX, clientY) {
+            const overlay = document.getElementById('circle-splat-layer');
+            const circleRect = document.getElementById('main-click-target').getBoundingClientRect();
+            const rx = clientX - circleRect.left;
+            const ry = clientY - circleRect.top;
+            
+            const splat = document.createElement('div');
+            splat.className = 'tomato-splatter-node golden-splat';
+            splat.style.left = rx + 'px';
+            splat.style.top = ry + 'px';
+            splat.style.setProperty('--r-rot', Math.random() * 360 + 'deg');
+            splat.style.setProperty('--r-scale', (Math.random() * 0.4 + 0.8));
+            splat.innerHTML = `
+                <svg class="splat-svg-graphic" viewBox="0 0 100 100">
+                    <path d="M50 10 C38 14,30 4,18 12 C8 20,15 35,4 45 C-5 55,6 70,14 80 C22 90,40 85,50 95 C60 105,72 90,84 85 C96 78,92 62,98 50 C104 36,94 26,84 16 C74 6,60 6,50 10Z"/>
+                    <circle cx="20" cy="25" r="4"/><circle cx="75" cy="20" r="3"/>
+                    <circle cx="85" cy="65" r="5"/><circle cx="15" cy="60" r="4"/>
+                </svg>
+            `;
+            overlay.appendChild(splat);
+
+            // Golden juice particles
+            for (let i = 0; i < 8 + Math.floor(Math.random() * 5); i++) {
+                const p = document.createElement('div');
+                p.className = 'juice-particle golden-juice';
+                p.style.left = rx + 'px';
+                p.style.top = ry + 'px';
+                const ang = Math.random() * Math.PI * 2;
+                const dist = 25 + Math.random() * 40;
+                p.style.setProperty('--jx', Math.cos(ang) * dist + 'px');
+                p.style.setProperty('--jy', Math.sin(ang) * dist + 'px');
+                overlay.appendChild(p);
+                setTimeout(() => { if (p.parentNode) p.remove(); }, 600);
+            }
+
+            setTimeout(() => { if (splat.parentNode) splat.remove(); }, 3500);
+        }
+
         // ============================================================
         // 10. VISUAL EFFECTS
         // ============================================================
-        function createThrowAnimation(clientX, clientY, container, targetX, targetY, isHit) {
+        function createThrowAnimation(clientX, clientY, container, targetX, targetY, isHit, isGolden) {
             const areaRect = container.getBoundingClientRect();
             const startX = areaRect.width / 2;
             const startY = areaRect.height + 40;
 
             const tomato = document.createElement('div');
-            tomato.className = 'flying-tomato';
-            tomato.innerText = '🍅';
+            if (isGolden) {
+                tomato.className = 'flying-golden-tomato';
+                tomato.innerText = '🌟';
+            } else {
+                tomato.className = 'flying-tomato';
+                tomato.innerText = '🍅';
+            }
             tomato.style.setProperty('--sx', startX + 'px');
             tomato.style.setProperty('--sy', startY + 'px');
             tomato.style.setProperty('--tx', targetX + 'px');
@@ -1772,10 +2053,11 @@
             container.appendChild(tomato);
 
             // Trail
+            const trailClass = isGolden ? 'tomato-trail golden-trail' : 'tomato-trail';
             for (let i = 1; i <= 3; i++) {
                 setTimeout(() => {
                     const dot = document.createElement('div');
-                    dot.className = 'tomato-trail';
+                    dot.className = trailClass;
                     const p = i / 4;
                     dot.style.left = (startX + (targetX - startX) * p) + 'px';
                     dot.style.top = (startY + (targetY - startY) * p) + 'px';
@@ -1786,13 +2068,13 @@
 
             setTimeout(() => {
                 tomato.remove();
-                if (isHit) {
+                if (isHit && !isGolden) {
                     const overlay = document.getElementById('circle-splat-layer');
                     const circleRect = document.getElementById('main-click-target').getBoundingClientRect();
                     const rx = clientX - circleRect.left;
                     const ry = clientY - circleRect.top;
                     triggerSplat(overlay, rx, ry, true);
-                } else {
+                } else if (!isHit) {
                     triggerSplat(container, targetX, targetY, false);
                 }
             }, 350);
@@ -1834,16 +2116,20 @@
             setTimeout(() => { if (splat.parentNode) splat.remove(); }, 3500);
         }
 
-        function triggerFloatingText(x, y, text, isCrit) {
+        function triggerFloatingText(x, y, text, isCrit, isGolden) {
             const area = document.getElementById('click-area');
             const el = document.createElement('div');
-            el.className = 'floating-text' + (isCrit ? ' crit-text' : '');
+            if (isGolden) {
+                el.className = 'floating-text golden-text';
+            } else {
+                el.className = 'floating-text' + (isCrit ? ' crit-text' : '');
+            }
             el.innerText = text;
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             el.style.transform = `translateX(${(Math.random() - 0.5) * 50}px)`;
             area.appendChild(el);
-            setTimeout(() => el.remove(), isCrit ? 850 : 650);
+            setTimeout(() => el.remove(), isGolden ? 900 : isCrit ? 850 : 650);
         }
 
         function triggerScreenShake() {
@@ -1870,59 +2156,11 @@
         function hideModal(id) { document.getElementById(id).classList.remove('show'); }
 
         // ============================================================
-        // 12. GOLDEN TOMATO
-        // ============================================================
-        function scheduleNextGoldenTomato() {
-            if (goldenTomatoSpawnTimerId) clearTimeout(goldenTomatoSpawnTimerId);
-            const delay = (30 + Math.random() * 45) * 1000;
-            goldenTomatoSpawnTimerId = setTimeout(spawnGoldenTomato, delay);
-        }
-
-        function spawnGoldenTomato() {
-            const area = document.getElementById('click-area');
-            const rect = area.getBoundingClientRect();
-            const el = document.createElement('div');
-            el.className = 'golden-tomato';
-            el.innerText = '🍅';
-            el.style.left = (20 + Math.random() * Math.max(40, rect.width - 80)) + 'px';
-            el.style.top = (10 + Math.random() * Math.max(40, rect.height - 80)) + 'px';
-            el.addEventListener('click', (ev) => { ev.stopPropagation();
-                collectGoldenTomato(el); });
-            area.appendChild(el);
-
-            if (goldenTomatoDespawnTimerId) clearTimeout(goldenTomatoDespawnTimerId);
-            goldenTomatoDespawnTimerId = setTimeout(() => {
-                if (el.parentNode) el.remove();
-                scheduleNextGoldenTomato();
-            }, 8000);
-        }
-
-        function collectGoldenTomato(el) {
-            if (goldenTomatoDespawnTimerId) clearTimeout(goldenTomatoDespawnTimerId);
-            if (el.parentNode) el.remove();
-            const roll = Math.random();
-            if (roll < 0.5) {
-                const tps = calculateTotalTPS();
-                const bonus = Math.max(500, Math.floor(tps * 60));
-                game.tomatoes += bonus;
-                game.stats.totalLifetimeTomatoes += bonus;
-                showToast('✨ Golden Tomato!', `+${formatNumber(bonus)} tomat!`);
-            } else {
-                goldenTomatoFrenzyUntil = Date.now() + 15000;
-                showToast('🔥 Tomato Frenzy!', 'Klik x7 selama 15 detik!');
-            }
-            updateUI();
-            saveGame();
-            scheduleNextGoldenTomato();
-        }
-
-        // ============================================================
-        // 13. SETTINGS / ACCENT COLOR
+        // 12. SETTINGS / ACCENT COLOR
         // ============================================================
         function applyAccentColor(hex) {
             const root = document.documentElement;
             root.style.setProperty('--accent-bright', hex);
-            // Darken for secondary colors
             const r = parseInt(hex.slice(1, 3), 16),
                 g = parseInt(hex.slice(3, 5), 16),
                 b = parseInt(hex.slice(5, 7), 16);
@@ -1951,7 +2189,7 @@
         }
 
         // ============================================================
-        // 14. ADMIN PANEL
+        // 13. ADMIN PANEL
         // ============================================================
         function initAdminPanel() {
             const trigger = 'adminpanel';
@@ -2015,8 +2253,9 @@
             });
             document.getElementById('admin-unlock-actives-btn').addEventListener('click', () => {
                 Object.keys(game.actives).forEach(k => game.actives[k] = true);
+                Object.keys(game.superUpgrades).forEach(k => game.superUpgrades[k] = true);
                 game.fineIDoItMyselfMultiplier = 3;
-                finalizeAdmin('Semua Active dibuka');
+                finalizeAdmin('Semua Active & Super dibuka');
             });
             document.getElementById('admin-unlock-achievements-btn').addEventListener('click', () => {
                 Object.keys(game.unlockedAchievements).forEach(k => game.unlockedAchievements[k] = true);
@@ -2041,7 +2280,7 @@
         }
 
         // ============================================================
-        // 15. TAB SYSTEM
+        // 14. TAB SYSTEM
         // ============================================================
         window.switchTab = function(columnType, tabId) {
             const pane = document.getElementById(tabId);
@@ -2050,12 +2289,19 @@
             const panes = column.querySelectorAll('.shop-pane');
             buttons.forEach(b => b.classList.remove('active'));
             panes.forEach(p => p.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            // Use the clicked button
+            const clickedBtn = Array.from(buttons).find(b => b.textContent.trim() === 
+                (tabId === 'normal-active' ? 'Upgrades' : 
+                 tabId === 'super-pane' ? 'Super' :
+                 tabId === 'normal-passive' ? 'Shops' :
+                 tabId === 'permanent-shop' ? '⭐ Rebirth Shop' :
+                 tabId === 'achievements-shop' ? '🏆 Badges' : ''));
+            if (clickedBtn) clickedBtn.classList.add('active');
             pane.classList.add('active');
         };
 
         // ============================================================
-        // 16. IDLE WATCHER
+        // 15. IDLE WATCHER
         // ============================================================
         function registerActivity() {
             lastActivityTimestamp = Date.now();
@@ -2074,7 +2320,7 @@
         }
 
         // ============================================================
-        // 17. EVENT BINDINGS & INIT
+        // 16. EVENT BINDINGS & INIT
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             // Click area
@@ -2090,12 +2336,15 @@
                 if (reward > 0 && confirm(`Lebur semua aset demi ${reward} Ascendent Tomato?`)) {
                     game.ascendentTomatoes += reward;
                     game.stats.totalRebirthsCount++;
-                    const subsidy = game.permanentUpgrades.heavenlySubsidy || 0;
-                    game.tomatoes = subsidy * 5000;
+                    const subsidy = game.permanentUpgrades.freshStart || 0;
+                    game.tomatoes = subsidy * 1000;
                     game.fineIDoItMyselfMultiplier = 1;
                     game.autoClickerLevel = 0;
+                    game.strongerThrowLevel = 0;
                     Object.keys(game.actives).forEach(k => game.actives[k] = false);
+                    Object.keys(game.superUpgrades).forEach(k => game.superUpgrades[k] = false);
                     Object.keys(game.passives).forEach(k => game.passives[k] = 0);
+                    game.stats.clickStreak = 0;
                     document.getElementById('circle-splat-layer').innerHTML = '';
                     reinitializeAutoClickerEngine();
                     runAchievementCheckRoutines();
@@ -2114,22 +2363,43 @@
                         tomatoes: 0,
                         ascendentTomatoes: 0,
                         fineIDoItMyselfMultiplier: 1,
-                        autoClickerLevel: 0,
                         lastSaveTime: Date.now(),
-                        stats: { totalLifetimeTomatoes: 0, totalManualClicks: 0, totalAutomatedClicks: 0,
-                        totalRebirthsCount: 0 },
-                        actives: { largerHand: false, fasterThrow: false, tomatoGun: false, leftHand: false,
-                            machineGun: false, mutation: false, bullsEye: false, artificialRain: false,
-                            fineIDoItMyself: false, nuclearSplatter: false, dimensionalGlove: false,
-                            infinitySplat: false },
-                        passives: { thrower: 0, tripleThrower: 0, gatling: 0, farm: 0, factory: 0, rain: 0,
-                            storm: 0, disaster: 0, catastrophe: 0, apocalypse: 0, galacticHarvest: 0,
-                            realityFolder: 0 },
-                        permanentUpgrades: { goldenSeeds: 0, ancestralJuicer: 0, heavenlySubsidy: 0,
-                            efficientFarming: 0, hyperDrive: 0 },
-                        unlockedAchievements: { firstSplat: false, tomatoMillionaire: false, clickAddict: false,
+                        stats: {
+                            totalLifetimeTomatoes: 0,
+                            totalManualClicks: 0,
+                            totalAutomatedClicks: 0,
+                            totalRebirthsCount: 0,
+                            lastClickTime: 0,
+                            clickStreak: 0
+                        },
+                        actives: {
+                            largerHand: false, tomatoGun: false, leftHand: false,
+                            machineGun: false, mutation: false, nuclearSplatter: false,
+                            dimensionalGlove: false, infinitySplat: false
+                        },
+                        superUpgrades: {
+                            fasterThrow: false, bullsEye: false, artificialRain: false,
+                            fineIDoItMyself: false
+                        },
+                        passives: {
+                            thrower: 0, tripleThrower: 0, gatling: 0, farm: 0, factory: 0,
+                            rain: 0, storm: 0, disaster: 0, catastrophe: 0, apocalypse: 0,
+                            galacticHarvest: 0, realityFolder: 0
+                        },
+                        autoClickerLevel: 0,
+                        strongerThrowLevel: 0,
+                        permanentUpgrades: {
+                            freshStart: 0,
+                            clickingFrenzy: 0,
+                            upgradeEfficiency: 0,
+                            secondLifePrifilage: 0,
+                            goldenTomato: 0
+                        },
+                        unlockedAchievements: {
+                            firstSplat: false, tomatoMillionaire: false, clickAddict: false,
                             rebirthAscension: false, industrialist: false, automationGod: false,
-                            billionaireClub: false, cosmicHarvester: false }
+                            billionaireClub: false, cosmicHarvester: false
+                        }
                     };
                     document.getElementById('custom-avatar').src = "";
                     document.getElementById('custom-avatar').style.display = 'none';
@@ -2177,9 +2447,9 @@
             setInterval(function() {
                 let income = 0;
                 PASSIVE_DB.forEach(p => { income += game.passives[p.id] * p.cps; });
-                if (game.actives.fineIDoItMyself) income *= 3;
-                if (game.actives.artificialRain) income *= 2;
-                income *= (1 + (game.ascendentTomatoes * 0.50)) * getPermanentShopMultiplier();
+                if (game.superUpgrades.fineIDoItMyself) income *= 3;
+                if (game.superUpgrades.artificialRain) income *= 2;
+                income *= (1 + (game.ascendentTomatoes * 0.50));
                 const earned = income * 0.5;
                 game.tomatoes += earned;
                 game.stats.totalLifetimeTomatoes += earned;
@@ -2195,7 +2465,6 @@
             initSettingsPanel();
             initAdminPanel();
             startIdleWatcher();
-            scheduleNextGoldenTomato();
         });
     </script>
 </body>
